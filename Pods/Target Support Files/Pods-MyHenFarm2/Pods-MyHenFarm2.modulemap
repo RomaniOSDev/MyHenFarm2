@@ -1,0 +1,6 @@
+framework module Pods_MyHenFarm2 {
+  umbrella header "Pods-MyHenFarm2-umbrella.h"
+
+  export *
+  module * { export * }
+}
