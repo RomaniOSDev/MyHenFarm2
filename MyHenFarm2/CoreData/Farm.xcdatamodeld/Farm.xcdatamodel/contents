@@ -5,5 +5,12 @@
         <attribute name="breed" optional="YES" attributeType="String"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="photo" optional="YES" attributeType="Binary"/>
+        <relationship name="coop" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Coop" inverseName="chiken" inverseEntity="Coop"/>
+    </entity>
+    <entity name="Coop" representedClassName="Coop" syncable="YES" codeGenerationType="class">
+        <attribute name="bildday" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="photo" optional="YES" attributeType="Binary"/>
+        <relationship name="chiken" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Chiken" inverseName="coop" inverseEntity="Chiken"/>
     </entity>
 </model>

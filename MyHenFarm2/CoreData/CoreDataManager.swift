@@ -33,6 +33,17 @@ final class CoreDataManager {
         
     }
     
+    //MARK: - Coops
+    func getCoops() -> [Coop] {
+        let fetchRequest: NSFetchRequest<Coop> = Coop.fetchRequest()
+        do {
+            return try context.fetch(fetchRequest)
+        }catch let error {
+            print("Fetch error \(error.localizedDescription)")
+            return []
+        }
+    }
+    
     //MARK: - Chiken
     func getChikens() -> [Chiken] {
         let fetchRequest: NSFetchRequest<Chiken> = Chiken.fetchRequest()
