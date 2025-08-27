@@ -31,6 +31,13 @@ struct MainView: View {
                         Text("Chiken")
                     }
                 }
+            StatisticOfHenhousesView()
+                .tabItem {
+                    VStack {
+                        Image(systemName: "chart.line.uptrend.xyaxis")
+                        Text("Statistics")
+                    }
+                }
             SettingsView()
                 .tabItem {
                     VStack {

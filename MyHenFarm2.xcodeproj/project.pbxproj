@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 70;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -15,6 +15,32 @@
 		74816A422E57AF0C0031320F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74816A3A2E57AF0C0031320F /* ViewController.swift */; };
 		74816A8D2E57B9330031320F /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74816A892E57B9330031320F /* CoreDataManager.swift */; };
 		74816A8E2E57B9330031320F /* Farm.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 74816A8A2E57B9330031320F /* Farm.xcdatamodeld */; };
+		74D1A28F2E5E51DC00A63DA4 /* AddChikenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A26C2E5E51DB00A63DA4 /* AddChikenView.swift */; };
+		74D1A2902E5E51DC00A63DA4 /* ChikenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A26D2E5E51DB00A63DA4 /* ChikenView.swift */; };
+		74D1A2912E5E51DC00A63DA4 /* ChikenViewmodel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A26E2E5E51DB00A63DA4 /* ChikenViewmodel.swift */; };
+		74D1A2922E5E51DC00A63DA4 /* CellForChokenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A2702E5E51DB00A63DA4 /* CellForChokenView.swift */; };
+		74D1A2932E5E51DC00A63DA4 /* CellForFeeding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A2712E5E51DB00A63DA4 /* CellForFeeding.swift */; };
+		74D1A2942E5E51DC00A63DA4 /* CellForHenhousesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A2722E5E51DB00A63DA4 /* CellForHenhousesView.swift */; };
+		74D1A2952E5E51DC00A63DA4 /* CellForLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A2732E5E51DB00A63DA4 /* CellForLogView.swift */; };
+		74D1A2962E5E51DC00A63DA4 /* CustomTimePickerDemoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A2742E5E51DB00A63DA4 /* CustomTimePickerDemoView.swift */; };
+		74D1A2972E5E51DC00A63DA4 /* CustomtimePickerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A2752E5E51DB00A63DA4 /* CustomtimePickerView.swift */; };
+		74D1A2982E5E51DC00A63DA4 /* GreenButtonView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A2762E5E51DB00A63DA4 /* GreenButtonView.swift */; };
+		74D1A2992E5E51DC00A63DA4 /* AddHenhousesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A2782E5E51DB00A63DA4 /* AddHenhousesView.swift */; };
+		74D1A29A2E5E51DC00A63DA4 /* BirdsListsview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A2792E5E51DB00A63DA4 /* BirdsListsview.swift */; };
+		74D1A29B2E5E51DC00A63DA4 /* HendosesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A27A2E5E51DB00A63DA4 /* HendosesViewModel.swift */; };
+		74D1A29C2E5E51DC00A63DA4 /* HenhousesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A27B2E5E51DB00A63DA4 /* HenhousesView.swift */; };
+		74D1A29D2E5E51DC00A63DA4 /* StatisticOfHenhousesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A27C2E5E51DB00A63DA4 /* StatisticOfHenhousesView.swift */; };
+		74D1A29E2E5E51DC00A63DA4 /* AddFeedingForMyFarmView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A27E2E5E51DB00A63DA4 /* AddFeedingForMyFarmView.swift */; };
+		74D1A29F2E5E51DC00A63DA4 /* FeedingForMyFarmView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A27F2E5E51DB00A63DA4 /* FeedingForMyFarmView.swift */; };
+		74D1A2A02E5E51DC00A63DA4 /* AddEggsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A2812E5E51DB00A63DA4 /* AddEggsView.swift */; };
+		74D1A2A12E5E51DC00A63DA4 /* AddLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A2822E5E51DB00A63DA4 /* AddLogView.swift */; };
+		74D1A2A22E5E51DC00A63DA4 /* AggsFeedingStatisticView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A2832E5E51DB00A63DA4 /* AggsFeedingStatisticView.swift */; };
+		74D1A2A32E5E51DC00A63DA4 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A2842E5E51DB00A63DA4 /* HomeView.swift */; };
+		74D1A2A42E5E51DC00A63DA4 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A2852E5E51DB00A63DA4 /* HomeViewModel.swift */; };
+		74D1A2A52E5E51DC00A63DA4 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A2872E5E51DB00A63DA4 /* MainView.swift */; };
+		74D1A2A62E5E51DC00A63DA4 /* OnBoardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A2892E5E51DB00A63DA4 /* OnBoardingView.swift */; };
+		74D1A2A72E5E51DC00A63DA4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A28B2E5E51DB00A63DA4 /* SettingsView.swift */; };
+		74D1A2A82E5E51DC00A63DA4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A28D2E5E51DB00A63DA4 /* ContentView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,11 +57,33 @@
 		74816A3A2E57AF0C0031320F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		74816A892E57B9330031320F /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
 		74816A8C2E57B9330031320F /* Farm.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Farm.xcdatamodel; sourceTree = "<group>"; };
+		74D1A26C2E5E51DB00A63DA4 /* AddChikenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddChikenView.swift; sourceTree = "<group>"; };
+		74D1A26D2E5E51DB00A63DA4 /* ChikenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChikenView.swift; sourceTree = "<group>"; };
+		74D1A26E2E5E51DB00A63DA4 /* ChikenViewmodel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChikenViewmodel.swift; sourceTree = "<group>"; };
+		74D1A2702E5E51DB00A63DA4 /* CellForChokenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellForChokenView.swift; sourceTree = "<group>"; };
+		74D1A2712E5E51DB00A63DA4 /* CellForFeeding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellForFeeding.swift; sourceTree = "<group>"; };
+		74D1A2722E5E51DB00A63DA4 /* CellForHenhousesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellForHenhousesView.swift; sourceTree = "<group>"; };
+		74D1A2732E5E51DB00A63DA4 /* CellForLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellForLogView.swift; sourceTree = "<group>"; };
+		74D1A2742E5E51DB00A63DA4 /* CustomTimePickerDemoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomTimePickerDemoView.swift; sourceTree = "<group>"; };
+		74D1A2752E5E51DB00A63DA4 /* CustomtimePickerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomtimePickerView.swift; sourceTree = "<group>"; };
+		74D1A2762E5E51DB00A63DA4 /* GreenButtonView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GreenButtonView.swift; sourceTree = "<group>"; };
+		74D1A2782E5E51DB00A63DA4 /* AddHenhousesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddHenhousesView.swift; sourceTree = "<group>"; };
+		74D1A2792E5E51DB00A63DA4 /* BirdsListsview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BirdsListsview.swift; sourceTree = "<group>"; };
+		74D1A27A2E5E51DB00A63DA4 /* HendosesViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HendosesViewModel.swift; sourceTree = "<group>"; };
+		74D1A27B2E5E51DB00A63DA4 /* HenhousesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HenhousesView.swift; sourceTree = "<group>"; };
+		74D1A27C2E5E51DB00A63DA4 /* StatisticOfHenhousesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatisticOfHenhousesView.swift; sourceTree = "<group>"; };
+		74D1A27E2E5E51DB00A63DA4 /* AddFeedingForMyFarmView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFeedingForMyFarmView.swift; sourceTree = "<group>"; };
+		74D1A27F2E5E51DB00A63DA4 /* FeedingForMyFarmView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedingForMyFarmView.swift; sourceTree = "<group>"; };
+		74D1A2812E5E51DB00A63DA4 /* AddEggsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddEggsView.swift; sourceTree = "<group>"; };
+		74D1A2822E5E51DB00A63DA4 /* AddLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddLogView.swift; sourceTree = "<group>"; };
+		74D1A2832E5E51DB00A63DA4 /* AggsFeedingStatisticView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AggsFeedingStatisticView.swift; sourceTree = "<group>"; };
+		74D1A2842E5E51DB00A63DA4 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
+		74D1A2852E5E51DB00A63DA4 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
+		74D1A2872E5E51DB00A63DA4 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		74D1A2892E5E51DB00A63DA4 /* OnBoardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnBoardingView.swift; sourceTree = "<group>"; };
+		74D1A28B2E5E51DB00A63DA4 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		74D1A28D2E5E51DB00A63DA4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		74816A492E57B2110031320F /* View */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = View; sourceTree = "<group>"; };
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		74816A172E57AC3B0031320F /* Frameworks */ = {
@@ -70,7 +118,7 @@
 			isa = PBXGroup;
 			children = (
 				74816A8B2E57B9330031320F /* CoreData */,
-				74816A492E57B2110031320F /* View */,
+				74D1A28E2E5E51DB00A63DA4 /* View */,
 				74816A322E57AF0C0031320F /* AppDelegate.swift */,
 				74816A332E57AF0C0031320F /* Assets.xcassets */,
 				74816A342E57AF0C0031320F /* Info.plist */,
@@ -89,6 +137,103 @@
 				74816A8A2E57B9330031320F /* Farm.xcdatamodeld */,
 			);
 			path = CoreData;
+			sourceTree = "<group>";
+		};
+		74D1A26F2E5E51DB00A63DA4 /* Chiken */ = {
+			isa = PBXGroup;
+			children = (
+				74D1A26C2E5E51DB00A63DA4 /* AddChikenView.swift */,
+				74D1A26D2E5E51DB00A63DA4 /* ChikenView.swift */,
+				74D1A26E2E5E51DB00A63DA4 /* ChikenViewmodel.swift */,
+			);
+			path = Chiken;
+			sourceTree = "<group>";
+		};
+		74D1A2772E5E51DB00A63DA4 /* Helpers */ = {
+			isa = PBXGroup;
+			children = (
+				74D1A2702E5E51DB00A63DA4 /* CellForChokenView.swift */,
+				74D1A2712E5E51DB00A63DA4 /* CellForFeeding.swift */,
+				74D1A2722E5E51DB00A63DA4 /* CellForHenhousesView.swift */,
+				74D1A2732E5E51DB00A63DA4 /* CellForLogView.swift */,
+				74D1A2742E5E51DB00A63DA4 /* CustomTimePickerDemoView.swift */,
+				74D1A2752E5E51DB00A63DA4 /* CustomtimePickerView.swift */,
+				74D1A2762E5E51DB00A63DA4 /* GreenButtonView.swift */,
+			);
+			path = Helpers;
+			sourceTree = "<group>";
+		};
+		74D1A27D2E5E51DB00A63DA4 /* HenHouses */ = {
+			isa = PBXGroup;
+			children = (
+				74D1A2782E5E51DB00A63DA4 /* AddHenhousesView.swift */,
+				74D1A2792E5E51DB00A63DA4 /* BirdsListsview.swift */,
+				74D1A27A2E5E51DB00A63DA4 /* HendosesViewModel.swift */,
+				74D1A27B2E5E51DB00A63DA4 /* HenhousesView.swift */,
+				74D1A27C2E5E51DB00A63DA4 /* StatisticOfHenhousesView.swift */,
+			);
+			path = HenHouses;
+			sourceTree = "<group>";
+		};
+		74D1A2802E5E51DB00A63DA4 /* Feedings */ = {
+			isa = PBXGroup;
+			children = (
+				74D1A27E2E5E51DB00A63DA4 /* AddFeedingForMyFarmView.swift */,
+				74D1A27F2E5E51DB00A63DA4 /* FeedingForMyFarmView.swift */,
+			);
+			path = Feedings;
+			sourceTree = "<group>";
+		};
+		74D1A2862E5E51DB00A63DA4 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				74D1A2802E5E51DB00A63DA4 /* Feedings */,
+				74D1A2812E5E51DB00A63DA4 /* AddEggsView.swift */,
+				74D1A2822E5E51DB00A63DA4 /* AddLogView.swift */,
+				74D1A2832E5E51DB00A63DA4 /* AggsFeedingStatisticView.swift */,
+				74D1A2842E5E51DB00A63DA4 /* HomeView.swift */,
+				74D1A2852E5E51DB00A63DA4 /* HomeViewModel.swift */,
+			);
+			path = Home;
+			sourceTree = "<group>";
+		};
+		74D1A2882E5E51DB00A63DA4 /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				74D1A2872E5E51DB00A63DA4 /* MainView.swift */,
+			);
+			path = Main;
+			sourceTree = "<group>";
+		};
+		74D1A28A2E5E51DB00A63DA4 /* Onboarding */ = {
+			isa = PBXGroup;
+			children = (
+				74D1A2892E5E51DB00A63DA4 /* OnBoardingView.swift */,
+			);
+			path = Onboarding;
+			sourceTree = "<group>";
+		};
+		74D1A28C2E5E51DB00A63DA4 /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				74D1A28B2E5E51DB00A63DA4 /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		74D1A28E2E5E51DB00A63DA4 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				74D1A26F2E5E51DB00A63DA4 /* Chiken */,
+				74D1A2772E5E51DB00A63DA4 /* Helpers */,
+				74D1A27D2E5E51DB00A63DA4 /* HenHouses */,
+				74D1A2862E5E51DB00A63DA4 /* Home */,
+				74D1A2882E5E51DB00A63DA4 /* Main */,
+				74D1A28A2E5E51DB00A63DA4 /* Onboarding */,
+				74D1A28C2E5E51DB00A63DA4 /* Settings */,
+				74D1A28D2E5E51DB00A63DA4 /* ContentView.swift */,
+			);
+			path = View;
 			sourceTree = "<group>";
 		};
 		95C3B8F4CB0FDD4A83A53447 /* Frameworks */ = {
@@ -123,9 +268,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				74816A492E57B2110031320F /* View */,
 			);
 			name = MyHenFarm2;
 			productName = MyHenFarm2;
@@ -208,6 +350,32 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				74D1A28F2E5E51DC00A63DA4 /* AddChikenView.swift in Sources */,
+				74D1A2902E5E51DC00A63DA4 /* ChikenView.swift in Sources */,
+				74D1A2912E5E51DC00A63DA4 /* ChikenViewmodel.swift in Sources */,
+				74D1A2922E5E51DC00A63DA4 /* CellForChokenView.swift in Sources */,
+				74D1A2932E5E51DC00A63DA4 /* CellForFeeding.swift in Sources */,
+				74D1A2942E5E51DC00A63DA4 /* CellForHenhousesView.swift in Sources */,
+				74D1A2952E5E51DC00A63DA4 /* CellForLogView.swift in Sources */,
+				74D1A2962E5E51DC00A63DA4 /* CustomTimePickerDemoView.swift in Sources */,
+				74D1A2972E5E51DC00A63DA4 /* CustomtimePickerView.swift in Sources */,
+				74D1A2982E5E51DC00A63DA4 /* GreenButtonView.swift in Sources */,
+				74D1A2992E5E51DC00A63DA4 /* AddHenhousesView.swift in Sources */,
+				74D1A29A2E5E51DC00A63DA4 /* BirdsListsview.swift in Sources */,
+				74D1A29B2E5E51DC00A63DA4 /* HendosesViewModel.swift in Sources */,
+				74D1A29C2E5E51DC00A63DA4 /* HenhousesView.swift in Sources */,
+				74D1A29D2E5E51DC00A63DA4 /* StatisticOfHenhousesView.swift in Sources */,
+				74D1A29E2E5E51DC00A63DA4 /* AddFeedingForMyFarmView.swift in Sources */,
+				74D1A29F2E5E51DC00A63DA4 /* FeedingForMyFarmView.swift in Sources */,
+				74D1A2A02E5E51DC00A63DA4 /* AddEggsView.swift in Sources */,
+				74D1A2A12E5E51DC00A63DA4 /* AddLogView.swift in Sources */,
+				74D1A2A22E5E51DC00A63DA4 /* AggsFeedingStatisticView.swift in Sources */,
+				74D1A2A32E5E51DC00A63DA4 /* HomeView.swift in Sources */,
+				74D1A2A42E5E51DC00A63DA4 /* HomeViewModel.swift in Sources */,
+				74D1A2A52E5E51DC00A63DA4 /* MainView.swift in Sources */,
+				74D1A2A62E5E51DC00A63DA4 /* OnBoardingView.swift in Sources */,
+				74D1A2A72E5E51DC00A63DA4 /* SettingsView.swift in Sources */,
+				74D1A2A82E5E51DC00A63DA4 /* ContentView.swift in Sources */,
 				74816A402E57AF0C0031320F /* AppDelegate.swift in Sources */,
 				74816A412E57AF0C0031320F /* SceneDelegate.swift in Sources */,
 				74816A422E57AF0C0031320F /* ViewController.swift in Sources */,
@@ -248,6 +416,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyHenFarm2/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "HenHouse Farm";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -259,7 +428,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = home.MyHenFarm2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.henhousefarm234.rre3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -281,6 +450,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyHenFarm2/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "HenHouse Farm";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -292,7 +462,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = home.MyHenFarm2;
+				PRODUCT_BUNDLE_IDENTIFIER = com.henhousefarm234.rre3;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;

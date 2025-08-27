@@ -23,33 +23,63 @@ struct HenhousesView: View {
                                     .aspectRatio(contentMode: .fill)
                                     .frame(width: 150, height: 100)
                                 
-                                Text("\(vm.hendoses.count) Coops")
-                                Text("0 Chikens")
+                                Text("\(vm.hendoses.count) Hendouses")
+                                Text("\(vm.getCountChiken()) Birds")
                             }
                             .frame(width: 150, height: 160)
                             .padding()
                             .background(Color.white.cornerRadius(20))
                             
-                            StatisticOfHenhousesView()
+                            NavigationLink {
+                                StatisticOfHenhousesView()
+                            } label: {
+                                VStack {
+                                    Image(systemName: "chart.line.uptrend.xyaxis")
+                                        .font(.system(size: 40))
+                                        .foregroundColor(.blue)
+                                    Text("Statistics")
+                                        .font(.caption)
+                                        .foregroundColor(.primary)
+                                }
+                            }
                             .frame(width: 150, height: 160)
                             .padding()
                             .background(Color.white.cornerRadius(20))
                         }
                         
-                        NavigationLink {
-                            AddHenhousesView(vm: vm)
-                        } label: {
-                            ZStack {
-                                RoundedRectangle(cornerRadius: 10)
-                                    .foregroundStyle(.white)
-                                HStack {
-                                    Image(systemName: "plus")
-                                    Text("Add Henhouse")
-                                    
+                        HStack(spacing: 16) {
+                            NavigationLink {
+                                AddHenhousesView(vm: vm)
+                            } label: {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .foregroundStyle(.white)
+                                    HStack {
+                                        Image(systemName: "plus")
+                                        Text("Add Henhouse")
+                                        
+                                    }
+                                    .padding()
+                                    .font(.headline)
+                                    .foregroundStyle(.black)
                                 }
-                                .padding()
-                                .font(.headline)
-                                .foregroundStyle(.black)
+                            }
+                            
+                            NavigationLink {
+                                CustomTimePickerDemoView()
+                            } label: {
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .foregroundStyle(.white)
+                                    HStack {
+                                        Image(systemName: "clock")
+                                        Text("Time Picker")
+                                        
+                                    }
+                                    .padding()
+                                    .font(.headline)
+                                    .foregroundStyle(.black)
+                                }
                             }
                         }
 
@@ -58,7 +88,7 @@ struct HenhousesView: View {
                         }
                         ForEach(vm.hendoses) { hendose in
                             CellForHenhousesView(henhous: hendose, action: {
-                                ///delete action
+                                vm.deleteHendHouse(at: hendose)
                             }, day7: 0, day30: 0)
                         }
                     }.padding()
@@ -72,10 +102,4 @@ struct HenhousesView: View {
 
 #Preview {
     HenhousesView()
-}
-
-struct StatisticOfHenhousesView: View {
-    var body: some View {
-        Text("StatisticOfHenhousesView")
-    }
 }

@@ -1,16 +1,31 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788.4" systemVersion="24G84" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="23788.4" systemVersion="24G90" minimumToolsVersion="Automatic" sourceLanguage="Swift" usedWithSwiftData="YES" userDefinedModelVersionIdentifier="">
     <entity name="Chiken" representedClassName="Chiken" syncable="YES" codeGenerationType="class">
         <attribute name="age" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="breed" optional="YES" attributeType="String"/>
         <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="note" optional="YES" attributeType="String"/>
         <attribute name="photo" optional="YES" attributeType="Binary"/>
-        <relationship name="coop" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Coop" inverseName="chiken" inverseEntity="Coop"/>
+        <relationship name="coop" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Coop" inverseName="chiken" inverseEntity="Coop"/>
     </entity>
     <entity name="Coop" representedClassName="Coop" syncable="YES" codeGenerationType="class">
         <attribute name="bildday" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="photo" optional="YES" attributeType="Binary"/>
         <relationship name="chiken" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Chiken" inverseName="coop" inverseEntity="Chiken"/>
+        <relationship name="eggsLog" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="EggsLog" inverseName="coop" inverseEntity="EggsLog"/>
+        <relationship name="feeding" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Feeding" inverseName="coop" inverseEntity="Feeding"/>
+    </entity>
+    <entity name="EggsLog" representedClassName="EggsLog" syncable="YES" codeGenerationType="class">
+        <attribute name="countEggs" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="date" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="note" optional="YES" attributeType="String"/>
+        <relationship name="coop" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Coop" inverseName="eggsLog" inverseEntity="Coop"/>
+    </entity>
+    <entity name="Feeding" representedClassName="Feeding" syncable="YES" codeGenerationType="class">
+        <attribute name="note" optional="YES" attributeType="String"/>
+        <attribute name="time" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="type" optional="YES" attributeType="String"/>
+        <relationship name="coop" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Coop" inverseName="feeding" inverseEntity="Coop"/>
     </entity>
 </model>

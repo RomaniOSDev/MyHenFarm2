@@ -5,10 +5,10 @@ workflows:
         groups:
           - app_store_credentials
         vars:
-          XCODE_WORKSPACE: "PopLinko.xcworkspace"
-          XCODE_SCHEME: "PopLinko"
-          BUNDLE_ID: "com.pau.p0pl1nko"
-          EXTENSION_BUDNLE_ID: "com.pau.p0pl1nko.OneSignalNotificationServiceExtension"
+          XCODE_WORKSPACE: "MyHenFarm2.xcworkspace"
+          XCODE_SCHEME: "MyHenFarm2"
+          BUNDLE_ID: "com.henhousefarm234.rre3"
+          EXTENSION_BUDNLE_ID: "com.henhousefarm234.rre3.OneSignalNotificationServiceExtension"
           APP_STORE_APP_ID: 6746077720
         xcode: latest
         cocoapods: 1.14.2

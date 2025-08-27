@@ -33,6 +33,38 @@ final class CoreDataManager {
         
     }
     
+    //MARK: - EggsLog
+    func getEggsLogs() -> [EggsLog] {
+        let fetchRequest: NSFetchRequest<EggsLog> = EggsLog.fetchRequest()
+        do {
+            return try context.fetch(fetchRequest)
+        }catch let error {
+            print("Fetch error \(error.localizedDescription)")
+            return []
+        }
+    }
+    
+    func deleteEggsLog(_ eggsLog: EggsLog) {
+        context.delete(eggsLog)
+        save()
+    }
+    
+    //MARK: - Feeding
+    func getFeedings() -> [Feeding] {
+        let fetchRequest: NSFetchRequest<Feeding> = Feeding.fetchRequest()
+        do {
+            return try context.fetch(fetchRequest)
+        }catch let error {
+            print("Fetch error \(error.localizedDescription)")
+            return []
+        }
+    }
+    
+    func deleteFeeding(_ feeding: Feeding) {
+        context.delete(feeding)
+        save()
+    }
+    
     //MARK: - Coops
     func getCoops() -> [Coop] {
         let fetchRequest: NSFetchRequest<Coop> = Coop.fetchRequest()
@@ -42,6 +74,11 @@ final class CoreDataManager {
             print("Fetch error \(error.localizedDescription)")
             return []
         }
+    }
+    
+    func deleteCoop(_ coop: Coop) {
+        context.delete(coop)
+        save()
     }
     
     //MARK: - Chiken

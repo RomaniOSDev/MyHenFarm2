@@ -11,7 +11,7 @@ import PhotosUI
 struct AddChikenView: View {
     @StateObject var vm: ChikenViewmodel
     @FocusState var isFocused: Bool
-
+    
     var body: some View {
         ZStack {
             Color.mainColorApp.ignoresSafeArea()
@@ -26,8 +26,8 @@ struct AddChikenView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                             .frame(width: 150, height: 150)
                             .aspectRatio(contentMode: .fit)
-                            
-                            
+                        
+                        
                     }
                     else{
                         Image(systemName: "plus.rectangle.fill")
@@ -44,40 +44,58 @@ struct AddChikenView: View {
                         }
                     }
                 }
-                
-                //MARK: - Name
-                VStack(alignment: .leading) {
-                    Text("Name")
-                        .font(.headline)
-                    TextField("Enter name", text: $vm.simplename)
-                        .padding(8)
-                        .background(Color.white.cornerRadius(8))
-                        .focused($isFocused)
+                ScrollView{
+                    //MARK: - Name
+                    VStack(alignment: .leading) {
+                        Text("Name")
+                            .font(.headline)
+                        TextField("Enter name", text: $vm.simplename)
+                            .padding(8)
+                            .background(Color.white.cornerRadius(8))
+                            .focused($isFocused)
+                    }
+                    .foregroundStyle(.black)
+                    
+                    //MARK: - Breed
+                    VStack(alignment: .leading) {
+                        Text("Breed")
+                            .font(.headline)
+                        TextField("Enter breed", text: $vm.simplebreed)
+                            .focused($isFocused)
+                            .padding(8)
+                            .background(Color.white.cornerRadius(8))
+                    }
+                    .foregroundStyle(.black)
+                    
+                    //MARK: - Age
+                    VStack(alignment: .leading) {
+                        Text("Age")
+                            .font(.headline)
+                        TextField("Enter age", text: $vm.simpleage)
+                            .focused($isFocused)
+                            .keyboardType(.numberPad)
+                            .padding(8)
+                            .background(Color.white.cornerRadius(8))
+                    }
+                    .foregroundStyle(.black)
+                    
+                    //MARK: - Note
+                    ZStack(alignment: .topLeading) {
+                        
+                        TextEditor(text: $vm.simpleNote)
+                            .frame(minHeight: 150)
+                            .focused($isFocused)
+                        if vm.simpleNote.isEmpty {
+                            Text("Add note")
+                                .foregroundColor(.gray)
+                                .padding(8)
+                        }
+                    }
+                    .padding()
+                    .background {
+                        Color.white.cornerRadius(8)
+                    }
                 }
-                .foregroundStyle(.black)
-                
-                //MARK: - Breed
-                VStack(alignment: .leading) {
-                    Text("Breed")
-                        .font(.headline)
-                    TextField("Enter breed", text: $vm.simplebreed)
-                        .focused($isFocused)
-                        .padding(8)
-                        .background(Color.white.cornerRadius(8))
-                }
-                .foregroundStyle(.black)
-                
-                //MARK: - Age
-                VStack(alignment: .leading) {
-                    Text("Age")
-                        .font(.headline)
-                    TextField("Enter age", text: $vm.simpleage)
-                        .focused($isFocused)
-                        .keyboardType(.numberPad)
-                        .padding(8)
-                        .background(Color.white.cornerRadius(8))
-                }
-                .foregroundStyle(.black)
                 
                 Spacer()
                 Button {
@@ -86,7 +104,7 @@ struct AddChikenView: View {
                     GreenButtonView(title: "Save")
                         .opacity(vm.simplename.isEmpty ? 0.5 : 1)
                 }.disabled(vm.simplename.isEmpty)
-
+                
             }
             .padding()
         }

@@ -19,6 +19,7 @@ final class ChikenViewmodel: ObservableObject {
     @Published var simplebreed: String = ""
     @Published var simpleage: String = ""
     @Published var simpleimage: UIImage? = nil
+    @Published var simpleNote: String = ""
     
     @Published var isPresenrAddView: Bool = false
     
@@ -62,6 +63,7 @@ final class ChikenViewmodel: ObservableObject {
         if let imageData = convertImageToData(simpleimage ?? UIImage()) {
             newChiken.photo = imageData
         }
+        newChiken.note = simpleNote
         saveData()
     }
     
