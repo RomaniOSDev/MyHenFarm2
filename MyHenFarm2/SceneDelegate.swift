@@ -14,12 +14,23 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
-        // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
-        // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
-        guard let windowScene = (scene as? UIWindowScene) else {return}
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene else { return }
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = UIHostingController(rootView: ContentView())
+        
+        let controller: UIViewController
+        
+        if let lastUrl = SaveService.lastUrl, let savedTime = SaveService.time {
+            if let expirationDate = parseDate(from: savedTime), Date() < expirationDate {
+                controller = WebviewVC(url: lastUrl)
+            } else {
+                SaveService.lastUrl = nil
+                SaveService.time = nil
+                controller = LoadingView()
+            }
+        } else {
+            controller = LoadingView()
+        }
+        window?.rootViewController = controller
         window?.makeKeyAndVisible()
     }
 
@@ -51,6 +62,45 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // to restore the scene back to its current state.
     }
 
-
+    private func parseDate(from dateString: String) -> Date? {
+        let dateFormatters: [DateFormatter] = [
+            {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
+                formatter.timeZone = TimeZone(abbreviation: "UTC")
+                return formatter
+            }(),
+            {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+                formatter.timeZone = TimeZone(abbreviation: "UTC")
+                return formatter
+            }(),
+            {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+                formatter.timeZone = TimeZone.current
+                return formatter
+            }(),
+            {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "yyyy-MM-dd"
+                formatter.timeZone = TimeZone.current
+                return formatter
+            }()
+        ]
+        
+        for formatter in dateFormatters {
+            if let date = formatter.date(from: dateString) {
+                return date
+            }
+        }
+        
+        if let timestamp = Double(dateString) {
+            return Date(timeIntervalSince1970: timestamp)
+        }
+        
+        return nil
+    }
 }
 

@@ -7,12 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		745D9BB12E624AC80031F9AC /* AppParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 745D9BAB2E624AC80031F9AC /* AppParameters.swift */; };
+		745D9BB22E624AC80031F9AC /* AppsFlyerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 745D9BAC2E624AC80031F9AC /* AppsFlyerManager.swift */; };
+		745D9BB32E624AC80031F9AC /* InternetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 745D9BAD2E624AC80031F9AC /* InternetViewController.swift */; };
+		745D9BB42E624AC80031F9AC /* LoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 745D9BAE2E624AC80031F9AC /* LoadingView.swift */; };
+		745D9BB52E624AC80031F9AC /* NetworkManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 745D9BAF2E624AC80031F9AC /* NetworkManager.swift */; };
+		745D9BB82E624B3A0031F9AC /* AppsFlyerLib in Frameworks */ = {isa = PBXBuildFile; productRef = 745D9BB72E624B3A0031F9AC /* AppsFlyerLib */; };
 		74816A3C2E57AF0C0031320F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 74816A332E57AF0C0031320F /* Assets.xcassets */; };
 		74816A3E2E57AF0C0031320F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 74816A362E57AF0C0031320F /* LaunchScreen.storyboard */; };
 		74816A3F2E57AF0C0031320F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 74816A382E57AF0C0031320F /* Main.storyboard */; };
 		74816A402E57AF0C0031320F /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74816A322E57AF0C0031320F /* AppDelegate.swift */; };
 		74816A412E57AF0C0031320F /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74816A392E57AF0C0031320F /* SceneDelegate.swift */; };
-		74816A422E57AF0C0031320F /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74816A3A2E57AF0C0031320F /* ViewController.swift */; };
 		74816A8D2E57B9330031320F /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74816A892E57B9330031320F /* CoreDataManager.swift */; };
 		74816A8E2E57B9330031320F /* Farm.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 74816A8A2E57B9330031320F /* Farm.xcdatamodeld */; };
 		74D1A28F2E5E51DC00A63DA4 /* AddChikenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A26C2E5E51DB00A63DA4 /* AddChikenView.swift */; };
@@ -47,6 +52,11 @@
 		1EAE2254FACEF7976B4A3525 /* Pods-MyHenFarm2.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyHenFarm2.release.xcconfig"; path = "Target Support Files/Pods-MyHenFarm2/Pods-MyHenFarm2.release.xcconfig"; sourceTree = "<group>"; };
 		22AEEFD6123B5132E8909B58 /* Pods-MyHenFarm2.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyHenFarm2.debug.xcconfig"; path = "Target Support Files/Pods-MyHenFarm2/Pods-MyHenFarm2.debug.xcconfig"; sourceTree = "<group>"; };
 		4D19C32FFEB834FB572E4200 /* Pods_MyHenFarm2.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MyHenFarm2.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		745D9BAB2E624AC80031F9AC /* AppParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppParameters.swift; sourceTree = "<group>"; };
+		745D9BAC2E624AC80031F9AC /* AppsFlyerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppsFlyerManager.swift; sourceTree = "<group>"; };
+		745D9BAD2E624AC80031F9AC /* InternetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternetViewController.swift; sourceTree = "<group>"; };
+		745D9BAE2E624AC80031F9AC /* LoadingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingView.swift; sourceTree = "<group>"; };
+		745D9BAF2E624AC80031F9AC /* NetworkManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkManager.swift; sourceTree = "<group>"; };
 		74816A1A2E57AC3B0031320F /* MyHenFarm2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MyHenFarm2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		74816A322E57AF0C0031320F /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		74816A332E57AF0C0031320F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -54,7 +64,6 @@
 		74816A352E57AF0C0031320F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		74816A372E57AF0C0031320F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		74816A392E57AF0C0031320F /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		74816A3A2E57AF0C0031320F /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		74816A892E57B9330031320F /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
 		74816A8C2E57B9330031320F /* Farm.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Farm.xcdatamodel; sourceTree = "<group>"; };
 		74D1A26C2E5E51DB00A63DA4 /* AddChikenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddChikenView.swift; sourceTree = "<group>"; };
@@ -90,12 +99,25 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				745D9BB82E624B3A0031F9AC /* AppsFlyerLib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		745D9BB02E624AC80031F9AC /* Loading */ = {
+			isa = PBXGroup;
+			children = (
+				745D9BAB2E624AC80031F9AC /* AppParameters.swift */,
+				745D9BAC2E624AC80031F9AC /* AppsFlyerManager.swift */,
+				745D9BAD2E624AC80031F9AC /* InternetViewController.swift */,
+				745D9BAE2E624AC80031F9AC /* LoadingView.swift */,
+				745D9BAF2E624AC80031F9AC /* NetworkManager.swift */,
+			);
+			path = Loading;
+			sourceTree = "<group>";
+		};
 		74816A112E57AC3B0031320F = {
 			isa = PBXGroup;
 			children = (
@@ -125,7 +147,6 @@
 				74816A362E57AF0C0031320F /* LaunchScreen.storyboard */,
 				74816A382E57AF0C0031320F /* Main.storyboard */,
 				74816A392E57AF0C0031320F /* SceneDelegate.swift */,
-				74816A3A2E57AF0C0031320F /* ViewController.swift */,
 			);
 			path = MyHenFarm2;
 			sourceTree = "<group>";
@@ -232,6 +253,7 @@
 				74D1A28A2E5E51DB00A63DA4 /* Onboarding */,
 				74D1A28C2E5E51DB00A63DA4 /* Settings */,
 				74D1A28D2E5E51DB00A63DA4 /* ContentView.swift */,
+				745D9BB02E624AC80031F9AC /* Loading */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -298,6 +320,9 @@
 				Base,
 			);
 			mainGroup = 74816A112E57AC3B0031320F;
+			packageReferences = (
+				745D9BB62E624B3A0031F9AC /* XCRemoteSwiftPackageReference "AppsFlyerFramework" */,
+			);
 			productRefGroup = 74816A1B2E57AC3B0031320F /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -369,6 +394,11 @@
 				74D1A29F2E5E51DC00A63DA4 /* FeedingForMyFarmView.swift in Sources */,
 				74D1A2A02E5E51DC00A63DA4 /* AddEggsView.swift in Sources */,
 				74D1A2A12E5E51DC00A63DA4 /* AddLogView.swift in Sources */,
+				745D9BB12E624AC80031F9AC /* AppParameters.swift in Sources */,
+				745D9BB22E624AC80031F9AC /* AppsFlyerManager.swift in Sources */,
+				745D9BB32E624AC80031F9AC /* InternetViewController.swift in Sources */,
+				745D9BB42E624AC80031F9AC /* LoadingView.swift in Sources */,
+				745D9BB52E624AC80031F9AC /* NetworkManager.swift in Sources */,
 				74D1A2A22E5E51DC00A63DA4 /* AggsFeedingStatisticView.swift in Sources */,
 				74D1A2A32E5E51DC00A63DA4 /* HomeView.swift in Sources */,
 				74D1A2A42E5E51DC00A63DA4 /* HomeViewModel.swift in Sources */,
@@ -378,7 +408,6 @@
 				74D1A2A82E5E51DC00A63DA4 /* ContentView.swift in Sources */,
 				74816A402E57AF0C0031320F /* AppDelegate.swift in Sources */,
 				74816A412E57AF0C0031320F /* SceneDelegate.swift in Sources */,
-				74816A422E57AF0C0031320F /* ViewController.swift in Sources */,
 				74816A8D2E57B9330031320F /* CoreDataManager.swift in Sources */,
 				74816A8E2E57B9330031320F /* Farm.xcdatamodeld in Sources */,
 			);
@@ -615,6 +644,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		745D9BB62E624B3A0031F9AC /* XCRemoteSwiftPackageReference "AppsFlyerFramework" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/AppsFlyerSDK/AppsFlyerFramework";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.17.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		745D9BB72E624B3A0031F9AC /* AppsFlyerLib */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 745D9BB62E624B3A0031F9AC /* XCRemoteSwiftPackageReference "AppsFlyerFramework" */;
+			productName = AppsFlyerLib;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		74816A8A2E57B9330031320F /* Farm.xcdatamodeld */ = {
