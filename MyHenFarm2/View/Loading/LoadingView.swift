@@ -92,8 +92,8 @@ class LoadingView: UIViewController {
         view.addSubview(containerView)
         
         // Loading image
-        loadingImageView.image = UIImage(named: "loading")
-        loadingImageView.contentMode = .scaleAspectFill
+        loadingImageView.image = UIImage(named: "logo")
+        loadingImageView.contentMode = .scaleAspectFit
         loadingImageView.translatesAutoresizingMaskIntoConstraints = false
         containerView.addSubview(loadingImageView)
         
@@ -242,24 +242,37 @@ class LoadingView: UIViewController {
                 return
             }
             
+            // Логирование ответа сервера
+            print("📥 Server Response:")
+            if let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted),
+               let jsonString = String(data: jsonData, encoding: .utf8) {
+                print(jsonString)
+            }
+            
             guard let status = json["ok"] as? Bool, status == true else {
                 let message = json["message"] as? String ?? "Server error"
+                print("❌ Server error: \(message)")
                 currentState = .error(message)
                 return
             }
 
             guard let urlString = json["url"] as? String, !urlString.isEmpty else {
+                print("❌ URL not found in response")
                 currentState = .error("URL not found")
                 return
             }
+            
+            print("✅ Success! URL received: \(urlString)")
             SaveService.lastUrl = URL(string: urlString)
             
             if let expiresString = json["expires"] as? String, !expiresString.isEmpty {
+                print("⏰ Expires: \(expiresString)")
                 SaveService.time = expiresString
             }
             
             currentState = .success(urlString)
         } catch {
+            print("❌ JSON parsing error: \(error.localizedDescription)")
             currentState = .error("error parsing JSON: \(error.localizedDescription)")
         }
     }
@@ -340,9 +353,11 @@ class LoadingView: UIViewController {
             return
         }
         
-        let webviewVC = WebviewVC(url: webURL)
-        webviewVC.modalPresentationStyle = .fullScreen
-        present(webviewVC, animated: true)
+        // Показываем экран разрешения уведомлений перед WebView
+        let notificationView = NotificationPermissionView(webURL: webURL)
+        let hostingController = UIHostingController(rootView: notificationView)
+        hostingController.modalPresentationStyle = .fullScreen
+        present(hostingController, animated: true)
     }
     
     private func navigateToContentView() {
