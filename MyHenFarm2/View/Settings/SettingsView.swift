@@ -14,6 +14,7 @@ struct SettingsView: View {
     @AppStorage("eggPrice") private var eggPrice: Double = 0.0
     @State private var showingResetAlert = false
     @State private var showingPolicy = false
+    @State private var showTestNonOrganic = false
     
     var body: some View {
         NavigationView {
@@ -53,6 +54,10 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $showingPolicy) {
             PolicyView()
+        }
+        .fullScreenCover(isPresented: $showTestNonOrganic) {
+            // Эмуляция: non-organic + сервер вернул ok и url
+            NotificationPermissionView(webURL: URL(string: "https://www.google.com")!)
         }
     }
     
@@ -172,6 +177,26 @@ struct SettingsView: View {
                     .cornerRadius(12)
                 }
                 
+                Button(action: {
+                    // Тестовый сценарий: AppsFlyer не organic, сервер ответил OK с url
+                    showTestNonOrganic = true
+                }) {
+                    HStack {
+                        Image(systemName: "play.rectangle.fill")
+                            .foregroundColor(.green)
+                        Text("Test Non-Organic Flow")
+                            .fontWeight(.medium)
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
+                    .foregroundColor(.primary)
+                    .padding()
+                    .background(Color.white)
+                    .cornerRadius(12)
+                }
+
                 Button(action: {
                    if let url = URL(string: "https://www.termsfeed.com/live/01379993-bcbb-40b2-972f-dbed3ca72b10") {
                         UIApplication.shared.open(url)

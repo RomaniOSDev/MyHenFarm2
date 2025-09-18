@@ -16,6 +16,7 @@ struct NotificationPermissionView: View {
     @State private var isAgreed = false
     @State private var backgroundImageName: ImageResource = .notif1
     @State private var notificationStatus: UNAuthorizationStatus = .notDetermined
+    private let skipKey = "NotificationSkipDate"
     
     // MARK: - Initialization
     init(webURL: URL) {
@@ -25,18 +26,12 @@ struct NotificationPermissionView: View {
     // MARK: - Body
     var body: some View {
         ZStack {
-            // Background image
-            
-            if orientation.isPortrait {
-                Image(backgroundImageName)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .ignoresSafeArea()
-            }else{
-                Image(backgroundImageName)
-                    .resizable()
-                    .ignoresSafeArea()
-            }
+            // Fullscreen background without side gaps
+            Image(backgroundImageName)
+                .resizable()
+                .scaledToFill()
+                .ignoresSafeArea()
+                .clipped()
                 
             
             // Content - показываем только если разрешение не определено
@@ -91,6 +86,7 @@ struct NotificationPermissionView: View {
                         Button(action: {
                             print("⏭️ User skipped notifications")
                             isAgreed = false
+                            UserDefaults.standard.set(Date(), forKey: skipKey)
                             openWebView()
                         }) {
                             Text("Skip")
@@ -118,16 +114,29 @@ struct NotificationPermissionView: View {
                 }
             }
         }
+        .background(Color.black.ignoresSafeArea())
         .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
             updateBackgroundForOrientation()
         }
         .onAppear {
             updateBackgroundForOrientation()
-            checkNotificationPermissionStatus()
+            handleInitialPermissionFlow()
         }
     }
     
     // MARK: - Private Methods
+    private func handleInitialPermissionFlow() {
+        if let lastSkip = UserDefaults.standard.object(forKey: skipKey) as? Date {
+            let threeDays: TimeInterval = 3 * 24 * 60 * 60
+            if Date().timeIntervalSince(lastSkip) < threeDays {
+                print("⏭️ Recently skipped (<3 days). Skipping permission screen.")
+                openWebView()
+                return
+            }
+        }
+        checkNotificationPermissionStatus()
+    }
+    
     private func checkNotificationPermissionStatus() {
         UNUserNotificationCenter.current().getNotificationSettings { settings in
             DispatchQueue.main.async {

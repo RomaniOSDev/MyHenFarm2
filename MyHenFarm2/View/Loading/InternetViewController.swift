@@ -25,11 +25,32 @@ class WebviewVC: UIViewController, WKNavigationDelegate  {
         privacyConfiguration.allowsPictureInPictureMediaPlayback = true
         privacyConfiguration.allowsAirPlayForMediaPlayback = true
         privacyConfiguration.allowsInlineMediaPlayback = true
+        
+        // Disable zoom: inject viewport meta and block pinch gesture
+        let userContentController = WKUserContentController()
+        let disableZoomScript = """
+        (function() {
+          var meta = document.querySelector('meta[name=viewport]');
+          if (!meta) {
+            meta = document.createElement('meta');
+            meta.name = 'viewport';
+            document.head.appendChild(meta);
+          }
+          meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+          document.addEventListener('gesturestart', function (e) { e.preventDefault(); }, { passive: false });
+        })();
+        """
+        userContentController.addUserScript(WKUserScript(source: disableZoomScript, injectionTime: .atDocumentEnd, forMainFrameOnly: true))
+        privacyConfiguration.userContentController = userContentController
         let privacyPreferences = WKWebpagePreferences()
         privacyPreferences.preferredContentMode = .mobile
         privacyConfiguration.defaultWebpagePreferences = privacyPreferences
         let webView = WKWebView(frame: .zero, configuration: privacyConfiguration)
         webView.translatesAutoresizingMaskIntoConstraints = false
+        // Block pinch zoom at UIScrollView level as well
+        webView.scrollView.pinchGestureRecognizer?.isEnabled = false
+        webView.scrollView.minimumZoomScale = 1.0
+        webView.scrollView.maximumZoomScale = 1.0
         return webView
     }()
     

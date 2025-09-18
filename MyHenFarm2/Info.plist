@@ -34,5 +34,13 @@
 			</array>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Нужен доступ к камере, чтобы делать фото ваших кур и курятников.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Нужен доступ к фотобиблиотеке, чтобы выбирать изображения для записей фермы.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Нужен доступ для сохранения фотографий, сделанных в приложении, в библиотеку.</string>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>Идентификатор для рекламы помогает нам показывать более релевантные предложения.</string>
 </dict>
 </plist>

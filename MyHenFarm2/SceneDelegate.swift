@@ -34,6 +34,66 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.makeKeyAndVisible()
     }
 
+    // MARK: - Deep Link Handling (Custom URL Schemes & Universal Links)
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        guard let context = URLContexts.first else { return }
+        handleDeepLink(url: context.url)
+    }
+    
+    func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
+        if userActivity.activityType == NSUserActivityTypeBrowsingWeb, let url = userActivity.webpageURL {
+            handleDeepLink(url: url)
+        }
+    }
+    
+    private func handleDeepLink(url: URL) {
+        print("📩 Deep link received: \(url.absoluteString)")
+        
+        // Пример: henhousefarm://web?url=https%3A%2F%2Fwww.google.com
+        let components = URLComponents(url: url, resolvingAgainstBaseURL: false)
+        let scheme = url.scheme?.lowercased()
+        let host = url.host?.lowercased()
+        
+        // Извлечь query параметр url, если есть
+        let urlParam = components?.queryItems?.first(where: { $0.name == "url" })?.value
+        let targetURLString: String?
+        if let urlParam, let decoded = urlParam.removingPercentEncoding { targetURLString = decoded } else { targetURLString = nil }
+        
+        // Условия показа WebView
+        let shouldOpenWebView: Bool = (scheme == "henhousefarm" && (host == "web" || host == "open")) || targetURLString != nil
+        
+        if shouldOpenWebView {
+            let fallback = "https://www.google.com"
+            let finalURLString = targetURLString ?? fallback
+            guard let finalURL = URL(string: finalURLString) else { return }
+            presentNotificationThenWebView(with: finalURL)
+            return
+        }
+        
+        // По умолчанию открыть основной контент
+        presentContentView()
+    }
+    
+    private func presentNotificationThenWebView(with url: URL) {
+        let vc = UIHostingController(rootView: NotificationPermissionView(webURL: url))
+        vc.modalPresentationStyle = .fullScreen
+        topMostViewController()?.present(vc, animated: true)
+    }
+    
+    private func presentContentView() {
+        let vc = UIHostingController(rootView: ContentView())
+        vc.modalPresentationStyle = .fullScreen
+        topMostViewController()?.present(vc, animated: true)
+    }
+    
+    private func topMostViewController(from root: UIViewController? = nil) -> UIViewController? {
+        let rootVC = root ?? window?.rootViewController
+        if let nav = rootVC as? UINavigationController { return topMostViewController(from: nav.visibleViewController) }
+        if let tab = rootVC as? UITabBarController { return topMostViewController(from: tab.selectedViewController) }
+        if let presented = rootVC?.presentedViewController { return topMostViewController(from: presented) }
+        return rootVC
+    }
+
     func sceneDidDisconnect(_ scene: UIScene) {
         // Called as the scene is being released by the system.
         // This occurs shortly after the scene enters the background, or when its session is discarded.

@@ -7,6 +7,9 @@
 
 import UIKit
 import SwiftUI
+import AppTrackingTransparency
+import AdSupport
+import Network
 
 // MARK: - Loading States
 enum LoadingState {
@@ -80,7 +83,20 @@ class LoadingView: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupConstraints()
-        startLoadingProcess()
+        // ATT запрос покажем в viewDidAppear, чтобы окно точно было на экране
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        requestTrackingIfNeeded { [weak self] in
+            self?.checkInternet { hasInternet in
+                if hasInternet {
+                    self?.startLoadingProcess()
+                } else {
+                    self?.presentNoInternetAlert()
+                }
+            }
+        }
     }
     
     // MARK: - UI Setup
@@ -143,6 +159,62 @@ class LoadingView: UIViewController {
     private func startLoadingProcess() {
         currentState = .loading
         getAppsFlyerData()
+    }
+
+    // MARK: - Test Action (removed)
+    
+    // MARK: - ATT
+    private func requestTrackingIfNeeded(completion: @escaping () -> Void) {
+        if #available(iOS 14, *) {
+            let status = ATTrackingManager.trackingAuthorizationStatus
+            switch status {
+            case .notDetermined:
+                ATTrackingManager.requestTrackingAuthorization { _ in
+                    DispatchQueue.main.async { completion() }
+                }
+            default:
+                completion()
+            }
+        } else {
+            completion()
+        }
+    }
+
+    // MARK: - Internet Check
+    private func checkInternet(completion: @escaping (Bool) -> Void) {
+        if #available(iOS 12.0, *) {
+            let monitor = NWPathMonitor()
+            let queue = DispatchQueue.global(qos: .background)
+            monitor.pathUpdateHandler = { path in
+                monitor.cancel()
+                DispatchQueue.main.async {
+                    completion(path.status == .satisfied)
+                }
+            }
+            monitor.start(queue: queue)
+        } else {
+            // Fallback: считаем, что интернет есть
+            completion(true)
+        }
+    }
+
+    private func presentNoInternetAlert() {
+        let alert = UIAlertController(title: "Нет подключения", message: "Проверьте интернет-соединение и повторите попытку.", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Настройки", style: .default, handler: { _ in
+            if let url = URL(string: UIApplication.openSettingsURLString) {
+                UIApplication.shared.open(url)
+            }
+        }))
+        alert.addAction(UIAlertAction(title: "Повторить", style: .default, handler: { [weak self] _ in
+            self?.checkInternet { hasInternet in
+                if hasInternet {
+                    self?.startLoadingProcess()
+                } else {
+                    self?.presentNoInternetAlert()
+                }
+            }
+        }))
+        present(alert, animated: true)
     }
     
     
