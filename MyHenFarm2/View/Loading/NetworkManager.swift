@@ -5,6 +5,9 @@
 //  Created by Роман Главацкий on 16.08.2025.
 //
 import Foundation
+import AppsFlyerLib
+import AdSupport
+import AppTrackingTransparency
 
 class NetworkManager {
     private let configuration: NetworkConfiguration
@@ -73,17 +76,42 @@ class NetworkManager {
     
     private func prepareRequestBody(appsFlyerData: [String: Any?], additionalData: [String: Any]) -> [String: Any] {
         var requestBody: [String: Any] = [:]
-        
+
+        // 1) Сначала добавим обязательные дополнительные данные
+        additionalData.forEach { requestBody[$0.key] = $0.value }
+
+        // 2) Распакуем структуру AppsFlyer: если есть request_data словарь — развернём его в корень
+        if let requestDataAny = appsFlyerData["request_data"] as? [String: Any] {
+            for (key, value) in requestDataAny { requestBody[key] = value }
+        }
+
+        // 3) Добавим прочие AF поля верхнего уровня, не перезаписывая уже добавленные
         for (key, value) in appsFlyerData {
-            if value != nil {
-                requestBody[key] = value!
+            guard key != "request_data" else { continue }
+            if let unwrapped = value, requestBody[key] == nil {
+                requestBody[key] = unwrapped
             }
         }
-        
-        additionalData.forEach { requestBody[$0.key] = $0.value }
-        
+
+        // 4) Подставим af_id (AppsFlyer UID), если отсутствует
+        if requestBody["af_id"] == nil {
+            requestBody["af_id"] = AppsFlyerLib.shared().getAppsFlyerUID()
+        }
+
+        // 5) Добавим IDFA, если доступен
+        if #available(iOS 14, *) {
+            if ATTrackingManager.trackingAuthorizationStatus == .authorized {
+                requestBody["idfa"] = ASIdentifierManager.shared().advertisingIdentifier.uuidString
+            }
+        } else {
+            if ASIdentifierManager.shared().isAdvertisingTrackingEnabled {
+                requestBody["idfa"] = ASIdentifierManager.shared().advertisingIdentifier.uuidString
+            }
+        }
+
+        // 6) Таймштамп для удобства сервера
         requestBody["timestamp"] = Date().timeIntervalSince1970
-        
+
         return requestBody
     }
     

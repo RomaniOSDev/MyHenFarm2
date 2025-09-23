@@ -31,6 +31,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             controller = LoadingView()
         }
         window?.rootViewController = controller
+        // Force light interface style across the app
+        window?.overrideUserInterfaceStyle = .light
         window?.makeKeyAndVisible()
     }
 
