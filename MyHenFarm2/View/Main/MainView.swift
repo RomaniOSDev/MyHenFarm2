@@ -9,42 +9,46 @@ import SwiftUI
 
 struct MainView: View {
     var body: some View {
-        TabView {
-            HomeView()
-                .tabItem {
-                    VStack {
-                        Image(systemName: "house")
-                        Text("Home")
+        ZStack {
+            TabView {
+                HomeView()
+                    .tabItem {
+                        VStack {
+                            Image(systemName: "house")
+                            Text("Home")
+                        }
                     }
-                }
-            HenhousesView()
-                .tabItem {
-                    VStack {
-                        Image(systemName: "circle.grid.3x3")
-                        Text("Henhouses")
+                HenhousesView()
+                    .tabItem {
+                        VStack {
+                            Image(systemName: "circle.grid.3x3")
+                            Text("Henhouses")
+                        }
                     }
-                }
-            ChikenView()
-                .tabItem {
-                    VStack {
-                        Image(systemName: "bird")
-                        Text("Chiken")
+                ChikenView()
+                    .tabItem {
+                        VStack {
+                            Image(systemName: "bird")
+                            Text("Chiken")
+                        }
                     }
-                }
-            StatisticOfHenhousesView()
-                .tabItem {
-                    VStack {
-                        Image(systemName: "chart.line.uptrend.xyaxis")
-                        Text("Statistics")
+                StatisticOfHenhousesView()
+                    .tabItem {
+                        VStack {
+                            Image(systemName: "chart.line.uptrend.xyaxis")
+                            Text("Statistics")
+                        }
                     }
-                }
-            SettingsView()
-                .tabItem {
-                    VStack {
-                        Image(systemName: "gear")
-                        Text("Settings")
+                SettingsView()
+                    .tabItem {
+                        VStack {
+                            Image(systemName: "gear")
+                            Text("Settings")
+                        }
                     }
-                }
+            }
+            VStack { Spacer(); BottomConsoleView() }
+                .allowsHitTesting(false)
         }
     }
 }

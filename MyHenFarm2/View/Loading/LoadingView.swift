@@ -31,6 +31,11 @@ class LoadingView: UIViewController {
         indicator.translatesAutoresizingMaskIntoConstraints = false
         return indicator
     }()
+    private lazy var consoleHosting: UIViewController = {
+        let host = UIHostingController(rootView: BottomConsoleView())
+        host.view.backgroundColor = .clear
+        return host
+    }()
     
     
     // MARK: - Properties
@@ -115,6 +120,11 @@ class LoadingView: UIViewController {
         
         // Activity indicator
         containerView.addSubview(activityIndicator)
+
+        // Bottom console host
+        addChild(consoleHosting)
+        view.addSubview(consoleHosting.view)
+        consoleHosting.didMove(toParent: self)
         
         // Add gradient overlay for better text readability
         addGradientOverlay()
@@ -137,6 +147,12 @@ class LoadingView: UIViewController {
             // Activity indicator
             activityIndicator.centerXAnchor.constraint(equalTo: containerView.centerXAnchor),
             activityIndicator.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
+
+            // Bottom console constraints
+            consoleHosting.view.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 0),
+            consoleHosting.view.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: 0),
+            consoleHosting.view.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -4),
+            consoleHosting.view.heightAnchor.constraint(greaterThanOrEqualToConstant: 120)
         ])
     }
     
@@ -220,6 +236,7 @@ class LoadingView: UIViewController {
     
     private func getAppsFlyerData() {
         print("getting conversion data...")
+        ConsoleLogger.shared.log("AF: requesting conversion data…")
         let appsFlyerTimeout = DispatchTime.now() + 10.0
         
         appsFlyerManager.getConversionData { [weak self] result in
@@ -229,10 +246,14 @@ class LoadingView: UIViewController {
                     print("Conversion data received: \(conversionData)")
                     self?.appsFlyerData = conversionData
                     self?.isConversionDataReceived = true
+                    let afStatus = (conversionData["af_status"] as? String) ?? "<nil>"
+                    let keys = Array(conversionData.keys).sorted().joined(separator: ", ")
+                    ConsoleLogger.shared.log("AF: conversion received, af_status=\(afStatus), keys=[\(keys)]")
                     self?.checkConversionStatusAndProceed(conversionData)
                     
                 case .failure(let error):
                     print("Failed to get conversion data: \(error.localizedDescription)")
+                    ConsoleLogger.shared.log("AF: conversion error → \(error.localizedDescription)")
                     self?.currentState = .error("Ошибка AppsFlyer: \(error.localizedDescription)")
                 }
             }
@@ -242,6 +263,7 @@ class LoadingView: UIViewController {
             guard let self = self else { return }
             if !self.isConversionDataReceived {
                 let timeoutError = NSError(domain: "AppsFlyer", code: 2002, userInfo: [NSLocalizedDescriptionKey: "Timeout AppsFlyer "])
+                ConsoleLogger.shared.log("AF: conversion timeout")
                 self.handleError(timeoutError)
             }
         }
@@ -253,18 +275,22 @@ class LoadingView: UIViewController {
                 conversionRetryCount = 1
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) { [weak self] in
+                    ConsoleLogger.shared.log("AF: Organic (retry once)…")
                     self?.retryConversionDataRequest()
                 }
             } else if afStatus == "Organic" && conversionRetryCount == 1 {
                 print("I'm organic")
+                ConsoleLogger.shared.log("AF: Organic → go to ContentView")
                 DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
                     self?.navigateToContentView()
                 }
             } else {
                 conversionRetryCount = 0
+                ConsoleLogger.shared.log("AF: Non-organic → sendNetworkRequest()")
                 sendNetworkRequest()
             }
         } else {
+            ConsoleLogger.shared.log("AF: af_status missing → sendNetworkRequest()")
             sendNetworkRequest()
         }
     }
@@ -287,6 +313,7 @@ class LoadingView: UIViewController {
     
 
     private func sendNetworkRequest() {
+        ConsoleLogger.shared.log("NET: sending conversion to server…")
         networkManager.sendConversionData(
             appsFlyerData: appsFlyerData,
             additionalData: additionalData
@@ -319,37 +346,44 @@ class LoadingView: UIViewController {
             if let jsonData = try? JSONSerialization.data(withJSONObject: json, options: .prettyPrinted),
                let jsonString = String(data: jsonData, encoding: .utf8) {
                 print(jsonString)
+                ConsoleLogger.shared.log("NET: response\n\(jsonString)")
             }
             
             guard let status = json["ok"] as? Bool, status == true else {
                 let message = json["message"] as? String ?? "Server error"
                 print("❌ Server error: \(message)")
+                ConsoleLogger.shared.log("NET: server error → \(message)")
                 currentState = .error(message)
                 return
             }
 
             guard let urlString = json["url"] as? String, !urlString.isEmpty else {
                 print("❌ URL not found in response")
+                ConsoleLogger.shared.log("NET: url not found in response")
                 currentState = .error("URL not found")
                 return
             }
             
             print("✅ Success! URL received: \(urlString)")
+            ConsoleLogger.shared.log("NET: success, url=\(urlString)")
             SaveService.lastUrl = URL(string: urlString)
             
             if let expiresString = json["expires"] as? String, !expiresString.isEmpty {
                 print("⏰ Expires: \(expiresString)")
+                ConsoleLogger.shared.log("NET: expires=\(expiresString)")
                 SaveService.time = expiresString
             }
             
             currentState = .success(urlString)
         } catch {
             print("❌ JSON parsing error: \(error.localizedDescription)")
+            ConsoleLogger.shared.log("NET: JSON parsing error → \(error.localizedDescription)")
             currentState = .error("error parsing JSON: \(error.localizedDescription)")
         }
     }
     
     private func handleError(_ error: NSError) {
+        ConsoleLogger.shared.log("NET: error code=\(error.code) desc=\(error.localizedDescription)")
 
         switch error.code {
         case 2001: // AppsFlyer conversion data error

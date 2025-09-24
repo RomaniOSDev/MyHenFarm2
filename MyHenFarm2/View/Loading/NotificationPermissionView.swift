@@ -113,6 +113,8 @@ struct NotificationPermissionView: View {
                     Spacer()
                 }
             }
+            // Bottom console overlay
+            VStack { Spacer(); BottomConsoleView() }
         }
         .background(Color.black.ignoresSafeArea())
         .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
