@@ -47,8 +47,6 @@ struct MainView: View {
                         }
                     }
             }
-            VStack { Spacer(); BottomConsoleView() }
-                .allowsHitTesting(false)
         }
     }
 }

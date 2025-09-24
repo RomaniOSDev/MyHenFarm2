@@ -27,8 +27,6 @@ struct ContentView: View {
                     ProgressView("\(percents)%")
                 }
             }
-            // Bottom console overlay
-            VStack { Spacer(); BottomConsoleView() }
         }
         .fullScreenCover(isPresented: $isShowNextView, content: {
             if isComlitedOnboarding {
