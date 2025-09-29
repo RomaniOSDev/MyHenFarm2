@@ -4,7 +4,7 @@ import UIKit
 import WebKit
 
 
-class WebViewVC: UIViewController, WKNavigationDelegate {
+class WebviewVC: UIViewController, WKNavigationDelegate {
     
     private var webView: WKWebView!
     private let startURL: URL
