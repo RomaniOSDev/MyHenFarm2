@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		7414223F2E8A750300679B8B /* CoreVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7414223E2E8A750300679B8B /* CoreVC.swift */; };
 		745D9BB12E624AC80031F9AC /* AppParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 745D9BAB2E624AC80031F9AC /* AppParameters.swift */; };
 		745D9BB22E624AC80031F9AC /* AppsFlyerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 745D9BAC2E624AC80031F9AC /* AppsFlyerManager.swift */; };
 		745D9BB32E624AC80031F9AC /* InternetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 745D9BAD2E624AC80031F9AC /* InternetViewController.swift */; };
@@ -54,7 +53,6 @@
 		1EAE2254FACEF7976B4A3525 /* Pods-MyHenFarm2.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyHenFarm2.release.xcconfig"; path = "Target Support Files/Pods-MyHenFarm2/Pods-MyHenFarm2.release.xcconfig"; sourceTree = "<group>"; };
 		22AEEFD6123B5132E8909B58 /* Pods-MyHenFarm2.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyHenFarm2.debug.xcconfig"; path = "Target Support Files/Pods-MyHenFarm2/Pods-MyHenFarm2.debug.xcconfig"; sourceTree = "<group>"; };
 		4D19C32FFEB834FB572E4200 /* Pods_MyHenFarm2.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MyHenFarm2.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		7414223E2E8A750300679B8B /* CoreVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreVC.swift; sourceTree = "<group>"; };
 		745D9BAB2E624AC80031F9AC /* AppParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppParameters.swift; sourceTree = "<group>"; };
 		745D9BAC2E624AC80031F9AC /* AppsFlyerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppsFlyerManager.swift; sourceTree = "<group>"; };
 		745D9BAD2E624AC80031F9AC /* InternetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternetViewController.swift; sourceTree = "<group>"; };
@@ -120,7 +118,6 @@
 				745D9BAE2E624AC80031F9AC /* LoadingView.swift */,
 				745D9BAF2E624AC80031F9AC /* NetworkManager.swift */,
 				74ADF7512E70B5F8005EF65E /* NotificationPermissionView.swift */,
-				7414223E2E8A750300679B8B /* CoreVC.swift */,
 			);
 			path = Loading;
 			sourceTree = "<group>";
@@ -411,7 +408,6 @@
 				74D1A2A22E5E51DC00A63DA4 /* AggsFeedingStatisticView.swift in Sources */,
 				74D1A2A32E5E51DC00A63DA4 /* HomeView.swift in Sources */,
 				74D1A2A42E5E51DC00A63DA4 /* HomeViewModel.swift in Sources */,
-				7414223F2E8A750300679B8B /* CoreVC.swift in Sources */,
 				74D1A2A52E5E51DC00A63DA4 /* MainView.swift in Sources */,
 				74D1A2A62E5E51DC00A63DA4 /* OnBoardingView.swift in Sources */,
 				74D1A2A72E5E51DC00A63DA4 /* SettingsView.swift in Sources */,
@@ -453,7 +449,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = MyHenFarm2/MyHenFarm2.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyHenFarm2/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "HenHouse Farm";
@@ -488,7 +484,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = MyHenFarm2/MyHenFarm2.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 10;
+				CURRENT_PROJECT_VERSION = 11;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyHenFarm2/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "HenHouse Farm";
