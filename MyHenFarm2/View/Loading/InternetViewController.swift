@@ -97,15 +97,33 @@ class WebviewVC: UIViewController, WKNavigationDelegate, WKUIDelegate {
     private func loadInitialURL() {
         activityIndicator.startAnimating()
         
-        // Создаем запрос с правильными заголовками
-        var request = URLRequest(url: termsURL)
-        request.timeoutInterval = 30
-        request.cachePolicy = .reloadIgnoringLocalCacheData
+        // 1) Очистим фрагмент из URL (убираем #:~:text и т.п.)
+        var components = URLComponents(url: termsURL, resolvingAgainstBaseURL: false)
+        components?.fragment = nil
+        let cleanURL = components?.url ?? termsURL
+        let targetHost = cleanURL.host ?? ""
         
-        // Добавляем User-Agent для мобильного устройства
-        request.setValue("Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1", forHTTPHeaderField: "User-Agent")
-        
-        firemanWebviewForTerms.load(request)
+        // 2) Очистим куки для домена и кэш перед загрузкой
+        let store = WKWebsiteDataStore.default()
+        store.httpCookieStore.getAllCookies { cookies in
+            for cookie in cookies where cookie.domain.contains(targetHost) {
+                store.httpCookieStore.delete(cookie)
+            }
+            let types: Set<String> = [WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache]
+            WKWebsiteDataStore.default().removeData(ofTypes: types, modifiedSince: .distantPast) { [weak self] in
+                guard let self = self else { return }
+                
+                // Создаем запрос с правильными заголовками
+                var request = URLRequest(url: cleanURL)
+                request.timeoutInterval = 30
+                request.cachePolicy = .reloadIgnoringLocalCacheData
+                
+                // Добавляем User-Agent для мобильного устройства
+                request.setValue("Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1", forHTTPHeaderField: "User-Agent")
+                
+                self.firemanWebviewForTerms.load(request)
+            }
+        }
     }
     
     // MARK: - Cookie Management
@@ -134,6 +152,8 @@ class WebviewVC: UIViewController, WKNavigationDelegate, WKUIDelegate {
             }
         }
     }
+    
+    
     
     // MARK: - WKNavigationDelegate
     func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
@@ -274,7 +294,6 @@ class WebviewVC: UIViewController, WKNavigationDelegate, WKUIDelegate {
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         print("WebView provisional navigation failed: \(error.localizedDescription)")
         activityIndicator.stopAnimating()
-        
         // Показываем ошибку пользователю
         showErrorAlert(message: error.localizedDescription)
     }
