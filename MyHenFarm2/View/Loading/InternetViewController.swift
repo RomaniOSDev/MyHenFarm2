@@ -20,6 +20,7 @@ class WebviewVC: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = .white
         presentSafariViewController()
     }
     
@@ -29,7 +30,12 @@ class WebviewVC: UIViewController {
         safariVC.preferredControlTintColor = UIColor.white
         safariVC.modalPresentationStyle = .fullScreen
         
-        present(safariVC, animated: true)
+        // Добавляем Safari как child view controller
+        addChild(safariVC)
+        view.addSubview(safariVC.view)
+        safariVC.view.frame = view.bounds
+        safariVC.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        safariVC.didMove(toParent: self)
     }
 }
 
