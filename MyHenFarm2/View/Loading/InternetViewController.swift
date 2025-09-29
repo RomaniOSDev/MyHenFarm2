@@ -1,7 +1,7 @@
 import UIKit
 import WebKit
 
-class WebviewVC: UIViewController, WKNavigationDelegate {
+class WebviewVC: UIViewController, WKNavigationDelegate, WKUIDelegate {
     
     // MARK: - Properties
     let termsURL: URL
@@ -16,7 +16,7 @@ class WebviewVC: UIViewController, WKNavigationDelegate {
         privacyConfiguration.preferences.javaScriptEnabled = true
         privacyConfiguration.preferences.javaScriptCanOpenWindowsAutomatically = true
         
-        // Disable zoom: inject viewport meta and block pinch gesture
+        // Disable zoom
         let userContentController = WKUserContentController()
         let disableZoomScript = """
         (function() {
@@ -40,12 +40,19 @@ class WebviewVC: UIViewController, WKNavigationDelegate {
         let webView = WKWebView(frame: .zero, configuration: privacyConfiguration)
         webView.translatesAutoresizingMaskIntoConstraints = false
         
-        // Block pinch zoom at UIScrollView level as well
+        // Block pinch zoom
         webView.scrollView.pinchGestureRecognizer?.isEnabled = false
         webView.scrollView.minimumZoomScale = 1.0
         webView.scrollView.maximumZoomScale = 1.0
         
         return webView
+    }()
+    
+    private let activityIndicator: UIActivityIndicatorView = {
+        let indicator = UIActivityIndicatorView(style: .medium)
+        indicator.translatesAutoresizingMaskIntoConstraints = false
+        indicator.hidesWhenStopped = true
+        return indicator
     }()
     
     // MARK: - Initialization
@@ -65,28 +72,40 @@ class WebviewVC: UIViewController, WKNavigationDelegate {
         setupUI()
         obtainCookies()
         firemanWebviewForTerms.navigationDelegate = self
+        firemanWebviewForTerms.uiDelegate = self
         loadInitialURL()
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
     }
     
     // MARK: - Setup Methods
     private func setupUI() {
         view.addSubview(firemanWebviewForTerms)
+        view.addSubview(activityIndicator)
+        
         firemanWebviewForTerms.allowsBackForwardNavigationGestures = true
         
         NSLayoutConstraint.activate([
             firemanWebviewForTerms.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             firemanWebviewForTerms.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             firemanWebviewForTerms.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            firemanWebviewForTerms.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            firemanWebviewForTerms.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            
+            activityIndicator.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            activityIndicator.centerYAnchor.constraint(equalTo: view.centerYAnchor)
         ])
     }
     
     private func loadInitialURL() {
-        firemanWebviewForTerms.load(URLRequest(url: termsURL))
+        activityIndicator.startAnimating()
+        
+        // Создаем запрос с правильными заголовками
+        var request = URLRequest(url: termsURL)
+        request.timeoutInterval = 30
+        request.cachePolicy = .reloadIgnoringLocalCacheData
+        
+        // Добавляем User-Agent для мобильного устройства
+        request.setValue("Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/15.0 Mobile/15E148 Safari/604.1", forHTTPHeaderField: "User-Agent")
+        
+        firemanWebviewForTerms.load(request)
     }
     
     // MARK: - Cookie Management
@@ -129,6 +148,16 @@ class WebviewVC: UIViewController, WKNavigationDelegate {
         print("Navigation attempt to: \(urlString)")
         print("Navigation type: \(navigationAction.navigationType.rawValue)")
         
+        // Проверяем, является ли ссылка той самой проблемной
+        if urlString.contains("test-web.syndi-test.net") {
+            print("🔗 Обнаружена целевая ссылка: \(urlString)")
+            
+            // Декодируем URL для лучшей читаемости
+            if let decodedString = urlString.removingPercentEncoding {
+                print("🔗 Декодированная ссылка: \(decodedString)")
+            }
+        }
+        
         // Блокируем опасные схемы
         if urlString.hasPrefix("file://") ||
            urlString.hasPrefix("javascript:") {
@@ -151,7 +180,7 @@ class WebviewVC: UIViewController, WKNavigationDelegate {
             return
         }
         
-        // Обрабатываем кастомные deeplink'и (замените на ваши схемы)
+        // Обрабатываем кастомные deeplink'и
         if urlString.hasPrefix("myapp://") ||
            urlString.hasPrefix("yourapp://") ||
            urlString.hasPrefix("appname://") {
@@ -162,8 +191,9 @@ class WebviewVC: UIViewController, WKNavigationDelegate {
             return
         }
         
-        // Разрешаем обычные HTTP/HTTPS запросы
+        // Разрешаем обычные HTTP/HTTPS запросы в WebView
         if urlString.hasPrefix("http://") || urlString.hasPrefix("https://") {
+            print("🌐 Loading URL in WebView: \(urlString)")
             decisionHandler(.allow)
             return
         }
@@ -176,13 +206,20 @@ class WebviewVC: UIViewController, WKNavigationDelegate {
     func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         // Открываем ссылки с target="_blank" в текущем webview
         if navigationAction.targetFrame == nil {
+            print("Opening target=_blank link: \(navigationAction.request.url?.absoluteString ?? "unknown")")
             webView.load(navigationAction.request)
         }
         return nil
     }
     
+    func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        print("WebView started loading")
+        activityIndicator.startAnimating()
+    }
+    
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         print("WebView finished loading")
+        activityIndicator.stopAnimating()
         
         if let url = webView.url {
             print("Current webview URL: \(url)")
@@ -199,42 +236,74 @@ class WebviewVC: UIViewController, WKNavigationDelegate {
         } else {
             print("Дата expires не найдена")
         }
+        
+        // Добавляем JavaScript для отладки кликов
+        let clickDebugScript = """
+        // Добавляем обработчики ко всем ссылкам
+        document.addEventListener('click', function(e) {
+            if (e.target.tagName === 'A' || e.target.closest('a')) {
+                const link = e.target.tagName === 'A' ? e.target : e.target.closest('a');
+                console.log('Clicked link:', link.href);
+                console.log('Link target:', link.target);
+                console.log('Link text:', link.textContent);
+            }
+        }, true);
+        
+        // Логируем все ссылки на странице
+        const links = document.getElementsByTagName('a');
+        console.log('Total links on page:', links.length);
+        for (let i = 0; i < links.length; i++) {
+            console.log('Link ' + i + ':', links[i].href, 'target:', links[i].target);
+        }
+        """
+        
+        webView.evaluateJavaScript(clickDebugScript) { result, error in
+            if let error = error {
+                print("Error injecting debug script: \(error)")
+            } else {
+                print("Debug script injected successfully")
+            }
+        }
     }
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         print("WebView navigation failed: \(error.localizedDescription)")
+        activityIndicator.stopAnimating()
     }
     
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         print("WebView provisional navigation failed: \(error.localizedDescription)")
+        activityIndicator.stopAnimating()
+        
+        // Показываем ошибку пользователю
+        showErrorAlert(message: error.localizedDescription)
+    }
+    
+    // MARK: - Error Handling
+    private func showErrorAlert(message: String) {
+        let alert = UIAlertController(title: "Ошибка загрузки",
+                                    message: message,
+                                    preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "Повторить", style: .default) { _ in
+            self.reload()
+        })
+        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
+        present(alert, animated: true)
     }
     
     // MARK: - DeepLink Handling
     private func handleDeepLink(_ url: URL) {
         print("Processing deeplink: \(url)")
         
-        // Здесь добавьте вашу логику обработки deeplink'ов
-        // Например:
-        // - Закрыть webview
-        // - Перейти на другой экран
-        // - Выполнить какое-то действие в приложении
-        
         let urlString = url.absoluteString
         print("Deeplink URL: \(urlString)")
         
         // Пример обработки различных deeplink'ов
         if urlString.contains("success") {
-            // Обработка успешного сценария
             print("Success deeplink detected")
         } else if urlString.contains("cancel") {
-            // Обработка отмены
             print("Cancel deeplink detected")
         }
-        
-        // Если нужно закрыть webview после обработки deeplink'а:
-        // self.dismiss(animated: true)
-        // или
-        // self.navigationController?.popViewController(animated: true)
     }
     
     // MARK: - Utility Methods
