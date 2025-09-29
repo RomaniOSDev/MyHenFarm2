@@ -3,102 +3,88 @@
 import UIKit
 import WebKit
 
-class WebviewVC: UIViewController, WKNavigationDelegate {
 
+class WebViewVC: UIViewController, WKNavigationDelegate {
+    
     private var webView: WKWebView!
-    private var currentURL: URL
-
-    // счётчик редиректов
-    private var redirectCount = 0
-    private let maxRedirects = 5
-
+    private let startURL: URL
+    
+    // MARK: - Init
     init(url: URL) {
-        self.currentURL = url
+        self.startURL = url
         super.init(nibName: nil, bundle: nil)
     }
-
+    
     required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        fatalError("init(coder:) не используется")
     }
-
+    
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .white
         setupWebView()
-        loadURL(currentURL)
+        loadURL(startURL)
     }
-
+    
     private func setupWebView() {
         let config = WKWebViewConfiguration()
-        webView = WKWebView(frame: view.bounds, configuration: config)
+        config.preferences.javaScriptEnabled = true
+        config.allowsInlineMediaPlayback = true
+        
+        webView = WKWebView(frame: .zero, configuration: config)
         webView.navigationDelegate = self
-        webView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        webView.translatesAutoresizingMaskIntoConstraints = false
+        
         view.addSubview(webView)
+        
+        NSLayoutConstraint.activate([
+            webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            webView.topAnchor.constraint(equalTo: view.topAnchor),
+            webView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
     }
-
+    
     private func loadURL(_ url: URL) {
-        let request = URLRequest(url: url)
-        redirectCount = 0
+        print("➡️ Загружаем: \(url.absoluteString)")
+        let request = URLRequest(url: url,
+                                 cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
+                                 timeoutInterval: 30)
         webView.load(request)
     }
-
-    /// Полный сброс и загрузка нового URL
-    func openNewURL(_ url: URL) {
-        webView.removeFromSuperview()
-        webView.navigationDelegate = nil
-        webView = nil
-
-        let dataStore = WKWebsiteDataStore.default()
-        dataStore.fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
-            dataStore.removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), for: records) {
-                print("🗑️ Cookies & Cache очищены")
-            }
+    
+    // MARK: - Helper для нормализации ссылок
+    private func safeURL(from raw: String) -> URL? {
+        if let url = URL(string: raw) {
+            return url
         }
-
-        setupWebView()
-        currentURL = url
-        loadURL(url)
+        if let encoded = raw.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
+            return URL(string: encoded)
+        }
+        return nil
     }
-
+    
     // MARK: - WKNavigationDelegate
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-
-        if let url = navigationAction.request.url {
-            print("👆 Клик по ссылке: \(url.absoluteString)")
-        }
-
-        decisionHandler(.allow)
-    }
-
-    func webView(_ webView: WKWebView,
-                 decidePolicyFor navigationResponse: WKNavigationResponse,
-                 decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-
-        // каждый новый ответ можно считать редиректом
-        redirectCount += 1
-        print("➡️ Редирект #\(redirectCount): \(webView.url?.absoluteString ?? "")")
-
-        if redirectCount > maxRedirects {
-            if let finalURL = webView.url {
-                print("❌ Слишком много редиректов. Перезапускаем загрузку: \(finalURL)")
-                decisionHandler(.cancel)
-                openNewURL(finalURL)
+        
+        if navigationAction.navigationType == .linkActivated,
+           let clickedURL = navigationAction.request.url {
+            
+            print("🔗 Клик по ссылке: \(clickedURL.absoluteString)")
+            
+            // Проверяем и нормализуем
+            if let safe = safeURL(from: clickedURL.absoluteString) {
+                decisionHandler(.cancel) // отменяем стандартный переход
+                loadURL(safe)            // загружаем заново
                 return
+            } else {
+                print("⚠️ Не удалось создать URL из: \(clickedURL.absoluteString)")
             }
         }
-
+        
         decisionHandler(.allow)
-    }
-
-    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        print("✅ Загружено: \(webView.url?.absoluteString ?? "")")
-        redirectCount = 0 // сбрасываем после успешной загрузки
-    }
-
-    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        print("❌ Ошибка: \(error.localizedDescription)")
     }
 }
 
