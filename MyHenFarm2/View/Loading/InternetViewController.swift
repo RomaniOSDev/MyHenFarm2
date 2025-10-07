@@ -1,13 +1,12 @@
-
-
 import UIKit
 import WebKit
-
 
 class WebviewVC: UIViewController, WKNavigationDelegate {
     
     private var webView: WKWebView!
     private let startURL: URL
+    private var redirectRetryCount = 0
+    private let maxRetryCount = 3
     
     // MARK: - Init
     init(url: URL) {
@@ -65,6 +64,7 @@ class WebviewVC: UIViewController, WKNavigationDelegate {
     }
     
     // MARK: - WKNavigationDelegate
+    
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
@@ -74,10 +74,9 @@ class WebviewVC: UIViewController, WKNavigationDelegate {
             
             print("🔗 Клик по ссылке: \(clickedURL.absoluteString)")
             
-            // Проверяем и нормализуем
             if let safe = safeURL(from: clickedURL.absoluteString) {
-                decisionHandler(.cancel) // отменяем стандартный переход
-                loadURL(safe)            // загружаем заново
+                decisionHandler(.cancel)
+                loadURL(safe)
                 return
             } else {
                 print("⚠️ Не удалось создать URL из: \(clickedURL.absoluteString)")
@@ -86,15 +85,39 @@ class WebviewVC: UIViewController, WKNavigationDelegate {
         
         decisionHandler(.allow)
     }
-}
-
-struct SaveService {
-    static var lastUrl: URL? {
-        get { UserDefaults.standard.url(forKey: "LastUrl") }
-        set { UserDefaults.standard.set(newValue, forKey: "LastUrl") }
+    
+    func webView(_ webView: WKWebView,
+                 didFail navigation: WKNavigation!,
+                 withError error: Error) {
+        handleError(error, currentURL: webView.url)
     }
-    static var time: String? {
-        get { UserDefaults.standard.string(forKey: "Time") }
-        set { UserDefaults.standard.set(newValue, forKey: "Time") }
+    
+    func webView(_ webView: WKWebView,
+                 didFailProvisionalNavigation navigation: WKNavigation!,
+                 withError error: Error) {
+        handleError(error, currentURL: webView.url)
+    }
+    
+    // MARK: - Обработка ошибок
+    private func handleError(_ error: Error, currentURL: URL?) {
+        let nsError = error as NSError
+        print("❌ Ошибка загрузки: \(nsError.code) — \(nsError.localizedDescription)")
+        
+        // Проверяем на ERR_TOO_MANY_REDIRECTS
+        if nsError.code == NSURLErrorHTTPTooManyRedirects {
+            guard redirectRetryCount < maxRetryCount else {
+                print("⚠️ Превышено количество повторных попыток после редиректов")
+                return
+            }
+            
+            redirectRetryCount += 1
+            print("🔄 Повторная загрузка после ERR_TOO_MANY_REDIRECTS (\(redirectRetryCount))")
+            
+            if let url = currentURL ?? startURL as URL? {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    self.loadURL(url)
+                }
+            }
+        }
     }
 }
