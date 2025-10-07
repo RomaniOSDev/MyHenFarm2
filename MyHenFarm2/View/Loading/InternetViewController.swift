@@ -1,7 +1,7 @@
 import UIKit
 import WebKit
 
-class WebviewVC: UIViewController, WKNavigationDelegate {
+final class WebviewVC: UIViewController, WKNavigationDelegate {
     
     private var webView: WKWebView!
     private let startURL: URL
@@ -25,6 +25,7 @@ class WebviewVC: UIViewController, WKNavigationDelegate {
         loadURL(startURL)
     }
     
+    // MARK: - Setup
     private func setupWebView() {
         let config = WKWebViewConfiguration()
         config.preferences.javaScriptEnabled = true
@@ -44,15 +45,18 @@ class WebviewVC: UIViewController, WKNavigationDelegate {
         ])
     }
     
+    // MARK: - Loading
     private func loadURL(_ url: URL) {
         print("➡️ Загружаем: \(url.absoluteString)")
-        let request = URLRequest(url: url,
-                                 cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
-                                 timeoutInterval: 30)
+        let request = URLRequest(
+            url: url,
+            cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
+            timeoutInterval: 30
+        )
         webView.load(request)
     }
     
-    // MARK: - Helper
+    // MARK: - Safe URL
     private func safeURL(from raw: String) -> URL? {
         var rawString = raw.trimmingCharacters(in: .whitespacesAndNewlines)
         
@@ -79,19 +83,31 @@ class WebviewVC: UIViewController, WKNavigationDelegate {
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         
-        if navigationAction.navigationType == .linkActivated,
-           let clickedURL = navigationAction.request.url {
-            
-            print("🔗 Клик по ссылке: \(clickedURL.absoluteString)")
-            
-            if let safe = safeURL(from: clickedURL.absoluteString) {
-                decisionHandler(.cancel)
-                loadURL(safe)
-                return
-            }
+        guard let url = navigationAction.request.url else {
+            decisionHandler(.cancel)
+            return
         }
         
-        decisionHandler(.allow)
+        let scheme = url.scheme?.lowercased() ?? ""
+        print("🌐 Навигация к URL: \(url.absoluteString)")
+        
+        // Разрешаем обычные http/https
+        if ["http", "https"].contains(scheme) {
+            decisionHandler(.allow)
+            return
+        }
+        
+        // Открываем внешние схемы (App Store, Appsflyer, Telegram, и т.д.)
+        if UIApplication.shared.canOpenURL(url) {
+            print("📲 Открываем внешнюю ссылку: \(url.absoluteString)")
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            decisionHandler(.cancel)
+            return
+        }
+        
+        // Остальные схемы блокируем
+        print("🚫 Блокируем неизвестную схему: \(scheme)")
+        decisionHandler(.cancel)
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -114,11 +130,11 @@ class WebviewVC: UIViewController, WKNavigationDelegate {
         handleError(error, currentURL: webView.url)
     }
     
-    // MARK: - Обработка ошибок
     private func handleError(_ error: Error, currentURL: URL?) {
         let nsError = error as NSError
         print("❌ Ошибка загрузки: \(nsError.code) — \(nsError.localizedDescription)")
         
+        // Обрабатываем слишком большое число редиректов
         if nsError.code == NSURLErrorHTTPTooManyRedirects {
             guard redirectRetryCount < maxRetryCount else {
                 print("⚠️ Превышено количество повторных попыток после редиректов")
@@ -128,10 +144,9 @@ class WebviewVC: UIViewController, WKNavigationDelegate {
             redirectRetryCount += 1
             print("🔄 Повторная загрузка после ERR_TOO_MANY_REDIRECTS (\(redirectRetryCount))")
             
-            if let url = currentURL ?? startURL as URL? {
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    self.loadURL(url)
-                }
+            let urlToReload = currentURL ?? startURL
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                self.loadURL(urlToReload)
             }
         }
     }
