@@ -52,14 +52,24 @@ class WebviewVC: UIViewController, WKNavigationDelegate {
         webView.load(request)
     }
     
-    // MARK: - Helper для нормализации ссылок
+    // MARK: - Helper
     private func safeURL(from raw: String) -> URL? {
-        if let url = URL(string: raw) {
-            return url
+        var rawString = raw.trimmingCharacters(in: .whitespacesAndNewlines)
+        
+        if !rawString.lowercased().hasPrefix("http://") &&
+           !rawString.lowercased().hasPrefix("https://") {
+            rawString = "https://" + rawString
         }
-        if let encoded = raw.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) {
-            return URL(string: encoded)
+        
+        if let direct = URL(string: rawString) {
+            return direct
         }
+        if let encoded = rawString.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed),
+           let encodedURL = URL(string: encoded) {
+            return encodedURL
+        }
+        
+        print("⚠️ safeURL: не удалось создать корректный URL из строки: \(raw)")
         return nil
     }
     
@@ -78,12 +88,18 @@ class WebviewVC: UIViewController, WKNavigationDelegate {
                 decisionHandler(.cancel)
                 loadURL(safe)
                 return
-            } else {
-                print("⚠️ Не удалось создать URL из: \(clickedURL.absoluteString)")
             }
         }
         
         decisionHandler(.allow)
+    }
+    
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        // ✅ Сохраняем последний успешный URL
+        if let currentURL = webView.url {
+            SaveService.lastUrl = currentURL
+            print("💾 Сохранён последний успешный URL: \(currentURL.absoluteString)")
+        }
     }
     
     func webView(_ webView: WKWebView,
@@ -103,7 +119,6 @@ class WebviewVC: UIViewController, WKNavigationDelegate {
         let nsError = error as NSError
         print("❌ Ошибка загрузки: \(nsError.code) — \(nsError.localizedDescription)")
         
-        // Проверяем на ERR_TOO_MANY_REDIRECTS
         if nsError.code == NSURLErrorHTTPTooManyRedirects {
             guard redirectRetryCount < maxRetryCount else {
                 print("⚠️ Превышено количество повторных попыток после редиректов")
@@ -119,5 +134,18 @@ class WebviewVC: UIViewController, WKNavigationDelegate {
                 }
             }
         }
+    }
+}
+
+
+
+struct SaveService {
+    static var lastUrl: URL? {
+        get { UserDefaults.standard.url(forKey: "LastUrl") }
+        set { UserDefaults.standard.set(newValue, forKey: "LastUrl") }
+    }
+    static var time: String? {
+        get { UserDefaults.standard.string(forKey: "Time") }
+        set { UserDefaults.standard.set(newValue, forKey: "Time") }
     }
 }
