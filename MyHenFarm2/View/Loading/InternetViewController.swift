@@ -23,9 +23,11 @@ final class WebviewVC: UIViewController, WKNavigationDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupWebView()
+        setupGestures()
         loadURL(startURL)
     }
 
+    // MARK: - Setup
     private func setupWebView() {
         let config = WKWebViewConfiguration()
         config.preferences.javaScriptEnabled = true
@@ -34,6 +36,7 @@ final class WebviewVC: UIViewController, WKNavigationDelegate {
         webView = WKWebView(frame: .zero, configuration: config)
         webView.navigationDelegate = self
         webView.translatesAutoresizingMaskIntoConstraints = false
+        webView.allowsBackForwardNavigationGestures = true  // ✅ включает свайп "назад/вперёд"
 
         view.addSubview(webView)
 
@@ -43,6 +46,19 @@ final class WebviewVC: UIViewController, WKNavigationDelegate {
             webView.topAnchor.constraint(equalTo: view.topAnchor),
             webView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+    }
+
+    private func setupGestures() {
+        // Добавим системный свайп-вперёд/назад, если отключен
+        let swipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipe(_:)))
+        swipeGesture.direction = .right
+        view.addGestureRecognizer(swipeGesture)
+    }
+
+    @objc private func handleSwipe(_ gesture: UISwipeGestureRecognizer) {
+        if gesture.direction == .right, webView.canGoBack {
+            webView.goBack()
+        }
     }
 
     // MARK: - URL Loading
@@ -118,17 +134,34 @@ final class WebviewVC: UIViewController, WKNavigationDelegate {
 
         if nsError.code == NSURLErrorHTTPTooManyRedirects {
             guard redirectRetryCount < maxRetryCount else {
-                print("⚠️ Превышено количество повторных попыток после редиректов")
+                print("⚠️ Превышено количество повторных попыток после редиректов. Очищаем cookies и кеш.")
+                clearCookiesAndRetry()
                 return
             }
 
             redirectRetryCount += 1
             print("🔄 Повторная загрузка после ERR_TOO_MANY_REDIRECTS (\(redirectRetryCount))")
 
-            // Загружаем последнюю успешную ссылку, если есть
             let urlToReload = SaveService.lastUrl ?? currentURL ?? startURL
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 self.loadURL(urlToReload)
+            }
+        }
+    }
+
+    // MARK: - Очистка cookies и кеша
+    private func clearCookiesAndRetry() {
+        let dataStore = WKWebsiteDataStore.default()
+        let types = WKWebsiteDataStore.allWebsiteDataTypes()
+
+        dataStore.fetchDataRecords(ofTypes: types) { records in
+            dataStore.removeData(ofTypes: types, for: records) {
+                print("🧹 Cookies и кеш очищены, пробуем заново.")
+                self.redirectRetryCount = 0
+                let urlToReload = SaveService.lastUrl ?? self.startURL
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    self.loadURL(urlToReload)
+                }
             }
         }
     }
@@ -140,6 +173,7 @@ struct SaveService {
         get { UserDefaults.standard.url(forKey: "LastUrl") }
         set { UserDefaults.standard.set(newValue, forKey: "LastUrl") }
     }
+
     static var time: String? {
         get { UserDefaults.standard.string(forKey: "Time") }
         set { UserDefaults.standard.set(newValue, forKey: "Time") }
