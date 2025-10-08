@@ -213,7 +213,8 @@ struct NotificationPermissionView: View {
     
     private func presentWebView(from viewController: UIViewController) {
         print("🚀 Creating WebView with URL: \(webURL)")
-        let webviewVC = WebviewVC(url: webURL)
+        //let webviewVC = WebviewVC(url: webURL)
+        let webviewVC = SafariTabsVC(url: webURL)
         webviewVC.modalPresentationStyle = .fullScreen
         
         print("📱 Presenting WebView from: \(type(of: viewController))")
