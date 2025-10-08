@@ -1,29 +1,25 @@
 import UIKit
 import WebKit
 
-final class WebviewVC: UIViewController, WKNavigationDelegate, UIGestureRecognizerDelegate {
+final class WebviewVC: UIViewController, WKNavigationDelegate {
 
     private var webView: WKWebView!
     private let startURL: URL
-
-    private var redirectRetryCount = 0
-    private let maxRetryCount = 5
+    private var progressView: UIProgressView!
+    private let maxRedirectChecks = 3
 
     // MARK: - Init
     init(url: URL) {
         self.startURL = url
         super.init(nibName: nil, bundle: nil)
     }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) не используется")
-    }
+    required init?(coder: NSCoder) { fatalError("init(coder:) не используется") }
 
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         setupWebView()
-        setupEdgeSwipeBack()
+        setupProgressView()
         loadURL(startURL)
     }
 
@@ -32,13 +28,11 @@ final class WebviewVC: UIViewController, WKNavigationDelegate, UIGestureRecogniz
         let config = WKWebViewConfiguration()
         config.preferences.javaScriptEnabled = true
         config.allowsInlineMediaPlayback = true
-        config.websiteDataStore = .default()
 
         webView = WKWebView(frame: .zero, configuration: config)
         webView.navigationDelegate = self
         webView.translatesAutoresizingMaskIntoConstraints = false
         webView.allowsBackForwardNavigationGestures = true
-
         view.addSubview(webView)
 
         NSLayoutConstraint.activate([
@@ -49,59 +43,44 @@ final class WebviewVC: UIViewController, WKNavigationDelegate, UIGestureRecogniz
         ])
     }
 
-    private func setupEdgeSwipeBack() {
-        // Более корректный "свайп слева — назад"
-        let edgePan = UIScreenEdgePanGestureRecognizer(target: self, action: #selector(handleEdgePan(_:)))
-        edgePan.edges = .left
-        edgePan.delegate = self
-        view.addGestureRecognizer(edgePan)
+    private func setupProgressView() {
+        progressView = UIProgressView(progressViewStyle: .bar)
+        progressView.progressTintColor = .systemBlue
+        progressView.translatesAutoresizingMaskIntoConstraints = false
+        progressView.isHidden = true
+        view.addSubview(progressView)
+
+        NSLayoutConstraint.activate([
+            progressView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            progressView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            progressView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            progressView.heightAnchor.constraint(equalToConstant: 2)
+        ])
     }
 
-    @objc private func handleEdgePan(_ gesture: UIScreenEdgePanGestureRecognizer) {
-        if gesture.state == .recognized, webView.canGoBack {
-            webView.goBack()
+    private func showProgress(_ show: Bool) {
+        DispatchQueue.main.async {
+            self.progressView.isHidden = !show
+            if show {
+                self.progressView.setProgress(0.3, animated: false)
+                UIView.animate(withDuration: 1.0) {
+                    self.progressView.setProgress(0.9, animated: true)
+                }
+            } else {
+                self.progressView.setProgress(0.0, animated: false)
+            }
         }
     }
 
-    // MARK: - Loading
+    // MARK: - URL Loading
     private func loadURL(_ url: URL) {
-        print("➡️ Загружаем: \(url.absoluteString)")
-        let request = URLRequest(url: url,
-                                 cachePolicy: .reloadIgnoringLocalAndRemoteCacheData,
-                                 timeoutInterval: 30)
-        webView.load(request)
-    }
-
-    // MARK: - Safe URL helper (улучшённый)
-    private func safeURL(from raw: String) -> URL? {
-        var rawString = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        rawString = rawString.replacingOccurrences(of: "\n", with: "")
-
-        if !rawString.lowercased().hasPrefix("http://") &&
-            !rawString.lowercased().hasPrefix("https://") {
-            rawString = "https://" + rawString
-        }
-
-        // Попробуем как есть
-        if let direct = URL(string: rawString) {
-            return direct
-        }
-
-        // Если не получилось — попробуем декодировать (убираем двойное кодирование)
-        let decoded = rawString.removingPercentEncoding ?? rawString
-
-        // Затем корректно закодируем фрагменты/параметры (разрешаем фрагменты)
-        if let encoded = decoded.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed),
-           let fixed = URL(string: encoded) {
-            return fixed
-        }
-
-        print("⚠️ safeURL: не удалось обработать ссылку: \(raw)")
-        return nil
+        print("➡️ Загружаем страницу: \(url.absoluteString)")
+        webView.load(URLRequest(url: url))
     }
 
     // MARK: - WKNavigationDelegate
-    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
+    func webView(_ webView: WKWebView,
+                 decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
 
         guard let url = navigationAction.request.url else {
@@ -109,96 +88,105 @@ final class WebviewVC: UIViewController, WKNavigationDelegate, UIGestureRecogniz
             return
         }
 
-        let rawString = url.absoluteString
-        print("🔗 Навигация: \(rawString)")
-
-        // Если это http/https — обычно разрешаем, но для сложных якорей принудительно загружаем
-        if let safe = safeURL(from: rawString) {
-            // Если в ссылке есть #:~:text= или закодированный # — WKWebView может некорректно обработать — загружаем вручную
-            if safe.absoluteString.contains("#:~:text=") || safe.absoluteString.contains("%23") {
-                print("⚙️ Принудительная загрузка сложной якорной ссылки")
-                decisionHandler(.cancel)
-                loadURL(safe)
-                return
-            }
-        }
-
-        // Обработка внешних схем (itms-apps, intent, appsflyer и т.д.)
-        if let scheme = url.scheme?.lowercased(), scheme != "http", scheme != "https" {
-            if UIApplication.shared.canOpenURL(url) {
-                // NOTE: для некоторых кастомных схем canOpenURL требует LSApplicationQueriesSchemes в Info.plist
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            } else {
-                print("🚫 Не удалось открыть внешнюю схему (canOpenURL == false): \(url.absoluteString)")
-            }
-            decisionHandler(.cancel)
-            return
-        }
-
-        // Нормальная навигация
-        decisionHandler(.allow)
+        // Проверяем каждый переход, включая клики и редиректы внутри страницы
+        print("🔗 Проверка перехода: \(url.absoluteString)")
+        decisionHandler(.cancel)
+        checkRedirect(for: url)
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        guard let url = webView.url else { return }
-        SaveService.lastUrl = url
-        redirectRetryCount = 0
-        print("✅ Успешно загружено: \(url.absoluteString)")
+        print("✅ Успешно загружено: \(webView.url?.absoluteString ?? "")")
+        showProgress(false)
     }
 
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        handleError(error, currentURL: webView.url)
+        showProgress(false)
+        print("❌ Ошибка навигации: \(error.localizedDescription)")
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        handleError(error, currentURL: webView.url)
+        showProgress(false)
+        print("❌ Ошибка provisionalNavigation: \(error.localizedDescription)")
     }
 
-    // MARK: - Error Handling
-    private func handleError(_ error: Error, currentURL: URL?) {
-        let nsError = error as NSError
-        print("❌ Ошибка загрузки: \(nsError.code) — \(nsError.localizedDescription)")
+    // MARK: - Redirect check
+    private func checkRedirect(for url: URL, attempt: Int = 1) {
+        showProgress(true)
+        print("🧭 Проверяем URL (\(attempt)) → \(url.absoluteString)")
 
-        if nsError.code == NSURLErrorHTTPTooManyRedirects {
-            guard redirectRetryCount < maxRetryCount else {
-                print("⚠️ Превышено количество попыток при ERR_TOO_MANY_REDIRECTS — очищаем cookies и кеш")
-                clearCookiesAndRetry(currentURL)
-                return
-            }
+        var request = URLRequest(url: url)
+        request.httpMethod = "HEAD"
+        request.timeoutInterval = 10
 
-            redirectRetryCount += 1
-            print("🔄 Повторная загрузка (\(redirectRetryCount)) после ERR_TOO_MANY_REDIRECTS")
+        let config = URLSessionConfiguration.default
+        let session = URLSession(configuration: config,
+                                 delegate: RedirectDetectingDelegate(),
+                                 delegateQueue: nil)
 
-            // Загружаем именно тот URL, на котором упали
-            guard let failedURL = currentURL else {
-                print("⚠️ Нет текущего URL — откатываемся к стартовому")
-                loadURL(startURL)
-                return
-            }
+        let task = session.dataTask(with: request) { [weak self] _, response, error in
+            guard let self = self else { return }
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                self.loadURL(failedURL)
-            }
-        }
-    }
-
-    // MARK: - Очистка cookies и кеша
-    private func clearCookiesAndRetry(_ failedURL: URL?) {
-        let dataStore = WKWebsiteDataStore.default()
-        let types = WKWebsiteDataStore.allWebsiteDataTypes()
-
-        dataStore.fetchDataRecords(ofTypes: types) { records in
-            dataStore.removeData(ofTypes: types, for: records) {
-                print("🧹 Cookies и кеш очищены, пробуем заново.")
-                self.redirectRetryCount = 0
-
-                // После очистки повторяем загрузку с той же страницы, где произошла ошибка
-                let retryURL = failedURL ?? self.startURL
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                    self.loadURL(retryURL)
+            if let error = error as? URLError, error.code == .httpTooManyRedirects {
+                print("⚠️ Цикл редиректов обнаружен")
+                if attempt < self.maxRedirectChecks {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        self.checkRedirect(for: url, attempt: attempt + 1)
+                    }
+                } else {
+                    self.showRedirectAlert(for: url)
                 }
+                return
+            }
+
+            guard let httpResponse = response as? HTTPURLResponse else {
+                print("❌ Нет корректного HTTP-ответа")
+                self.showRedirectAlert(for: url)
+                return
+            }
+
+            if (200..<400).contains(httpResponse.statusCode) {
+                print("✅ Проверка успешна, статус \(httpResponse.statusCode)")
+                DispatchQueue.main.async {
+                    self.loadURL(url)
+                }
+            } else {
+                print("⚠️ Неуспешный статус: \(httpResponse.statusCode)")
+                self.showRedirectAlert(for: url)
+            }
+
+            DispatchQueue.main.async {
+                self.showProgress(false)
             }
         }
+        task.resume()
+    }
+
+    // MARK: - Alert
+    private func showRedirectAlert(for url: URL) {
+        DispatchQueue.main.async {
+            self.showProgress(false)
+            let alert = UIAlertController(
+                title: "Ошибка загрузки",
+                message: "Слишком много перенаправлений при попытке открыть:\n\(url.absoluteString)",
+                preferredStyle: .alert
+            )
+            alert.addAction(UIAlertAction(title: "Повторить", style: .default) { _ in
+                self.checkRedirect(for: url)
+            })
+            alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
+            self.present(alert, animated: true)
+        }
+    }
+}
+
+// MARK: - Redirect detector delegate
+private final class RedirectDetectingDelegate: NSObject, URLSessionTaskDelegate {
+    func urlSession(_ session: URLSession,
+                    task: URLSessionTask,
+                    willPerformHTTPRedirection response: HTTPURLResponse,
+                    newRequest request: URLRequest,
+                    completionHandler: @escaping (URLRequest?) -> Void) {
+        completionHandler(request) // позволяем максимум 20 редиректов
     }
 }
 
@@ -208,6 +196,7 @@ struct SaveService {
         get { UserDefaults.standard.url(forKey: "LastUrl") }
         set { UserDefaults.standard.set(newValue, forKey: "LastUrl") }
     }
+
     static var time: String? {
         get { UserDefaults.standard.string(forKey: "Time") }
         set { UserDefaults.standard.set(newValue, forKey: "Time") }
