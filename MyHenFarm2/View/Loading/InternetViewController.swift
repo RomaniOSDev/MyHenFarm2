@@ -1,7 +1,7 @@
 import UIKit
 import WebKit
 
-final class WebviewVC: UIViewController, WKNavigationDelegate, UIGestureRecognizerDelegate {
+final class WebviewVC: UIViewController, WKNavigationDelegate {
 
     private var webView: WKWebView!
     private let startURL: URL
@@ -27,20 +27,16 @@ final class WebviewVC: UIViewController, WKNavigationDelegate, UIGestureRecogniz
         loadURL(startURL)
     }
 
-    // MARK: - Setup
+    // MARK: - Setup WebView
     private func setupWebView() {
         let config = WKWebViewConfiguration()
         config.preferences.javaScriptEnabled = true
-        config.allowsInlineMediaPlayback = true
-        config.websiteDataStore = .default()
-
         webView = WKWebView(frame: .zero, configuration: config)
         webView.navigationDelegate = self
-        webView.translatesAutoresizingMaskIntoConstraints = false
         webView.allowsBackForwardNavigationGestures = true
+        webView.translatesAutoresizingMaskIntoConstraints = false
 
         view.addSubview(webView)
-
         NSLayoutConstraint.activate([
             webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
@@ -49,11 +45,10 @@ final class WebviewVC: UIViewController, WKNavigationDelegate, UIGestureRecogniz
         ])
     }
 
+    // MARK: - Edge Swipe Back
     private func setupEdgeSwipeBack() {
-        // Более корректный "свайп слева — назад"
         let edgePan = UIScreenEdgePanGestureRecognizer(target: self, action: #selector(handleEdgePan(_:)))
         edgePan.edges = .left
-        edgePan.delegate = self
         view.addGestureRecognizer(edgePan)
     }
 
@@ -63,7 +58,7 @@ final class WebviewVC: UIViewController, WKNavigationDelegate, UIGestureRecogniz
         }
     }
 
-    // MARK: - Loading
+    // MARK: - Load URL
     private func loadURL(_ url: URL) {
         print("➡️ Загружаем: \(url.absoluteString)")
         let request = URLRequest(url: url,
@@ -72,31 +67,24 @@ final class WebviewVC: UIViewController, WKNavigationDelegate, UIGestureRecogniz
         webView.load(request)
     }
 
-    // MARK: - Safe URL helper (улучшённый)
+    // MARK: - Safe URL helper
     private func safeURL(from raw: String) -> URL? {
         var rawString = raw.trimmingCharacters(in: .whitespacesAndNewlines)
-        rawString = rawString.replacingOccurrences(of: "\n", with: "")
-
         if !rawString.lowercased().hasPrefix("http://") &&
             !rawString.lowercased().hasPrefix("https://") {
             rawString = "https://" + rawString
         }
 
-        // Попробуем как есть
-        if let direct = URL(string: rawString) {
-            return direct
+        if let url = URL(string: rawString) {
+            return url
         }
 
-        // Если не получилось — попробуем декодировать (убираем двойное кодирование)
-        let decoded = rawString.removingPercentEncoding ?? rawString
-
-        // Затем корректно закодируем фрагменты/параметры (разрешаем фрагменты)
-        if let encoded = decoded.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed),
-           let fixed = URL(string: encoded) {
-            return fixed
+        if let encoded = rawString.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed),
+           let encodedURL = URL(string: encoded) {
+            return encodedURL
         }
 
-        print("⚠️ safeURL: не удалось обработать ссылку: \(raw)")
+        print("⚠️ safeURL: не удалось создать URL из строки: \(raw)")
         return nil
     }
 
@@ -109,33 +97,14 @@ final class WebviewVC: UIViewController, WKNavigationDelegate, UIGestureRecogniz
             return
         }
 
-        let rawString = url.absoluteString
-        print("🔗 Навигация: \(rawString)")
-
-        // Если это http/https — обычно разрешаем, но для сложных якорей принудительно загружаем
-        if let safe = safeURL(from: rawString) {
-            // Если в ссылке есть #:~:text= или закодированный # — WKWebView может некорректно обработать — загружаем вручную
-            if safe.absoluteString.contains("#:~:text=") || safe.absoluteString.contains("%23") {
-                print("⚙️ Принудительная загрузка сложной якорной ссылки")
-                decisionHandler(.cancel)
-                loadURL(safe)
-                return
-            }
-        }
-
-        // Обработка внешних схем (itms-apps, intent, appsflyer и т.д.)
-        if let scheme = url.scheme?.lowercased(), scheme != "http", scheme != "https" {
-            if UIApplication.shared.canOpenURL(url) {
-                // NOTE: для некоторых кастомных схем canOpenURL требует LSApplicationQueriesSchemes в Info.plist
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            } else {
-                print("🚫 Не удалось открыть внешнюю схему (canOpenURL == false): \(url.absoluteString)")
-            }
+        // Сложные ссылки типа Appsflyer с #:~:text
+        if let safe = safeURL(from: url.absoluteString),
+           (safe.absoluteString.contains("#:~:text=") || safe.absoluteString.contains("%23")) {
             decisionHandler(.cancel)
+            loadURL(safe)
             return
         }
 
-        // Нормальная навигация
         decisionHandler(.allow)
     }
 
@@ -161,15 +130,14 @@ final class WebviewVC: UIViewController, WKNavigationDelegate, UIGestureRecogniz
 
         if nsError.code == NSURLErrorHTTPTooManyRedirects {
             guard redirectRetryCount < maxRetryCount else {
-                print("⚠️ Превышено количество попыток при ERR_TOO_MANY_REDIRECTS — очищаем cookies и кеш")
+                print("⚠️ Превышено количество повторных попыток после редиректов, очищаем cookies и кеш")
                 clearCookiesAndRetry()
                 return
             }
 
             redirectRetryCount += 1
-            print("🔄 Повторная загрузка (\(redirectRetryCount)) после ERR_TOO_MANY_REDIRECTS")
-
             let urlToReload = SaveService.lastUrl ?? currentURL ?? startURL
+            print("🔄 Повторная загрузка (\(redirectRetryCount)) URL: \(urlToReload.absoluteString)")
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
                 self.loadURL(urlToReload)
             }
@@ -180,7 +148,6 @@ final class WebviewVC: UIViewController, WKNavigationDelegate, UIGestureRecogniz
     private func clearCookiesAndRetry() {
         let dataStore = WKWebsiteDataStore.default()
         let types = WKWebsiteDataStore.allWebsiteDataTypes()
-
         dataStore.fetchDataRecords(ofTypes: types) { records in
             dataStore.removeData(ofTypes: types, for: records) {
                 print("🧹 Cookies и кеш очищены, пробуем заново.")
@@ -193,6 +160,7 @@ final class WebviewVC: UIViewController, WKNavigationDelegate, UIGestureRecogniz
         }
     }
 }
+
 
 // MARK: - SaveService
 struct SaveService {

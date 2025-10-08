@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		743BFE332E9681DB00FC549B /* SafariTabsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 743BFE322E9681D300FC549B /* SafariTabsVC.swift */; };
-		743BFE352E96922900FC549B /* PreloadedSafariVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 743BFE342E96922400FC549B /* PreloadedSafariVC.swift */; };
 		745D9BB12E624AC80031F9AC /* AppParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 745D9BAB2E624AC80031F9AC /* AppParameters.swift */; };
 		745D9BB22E624AC80031F9AC /* AppsFlyerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 745D9BAC2E624AC80031F9AC /* AppsFlyerManager.swift */; };
 		745D9BB32E624AC80031F9AC /* InternetViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 745D9BAD2E624AC80031F9AC /* InternetViewController.swift */; };
@@ -56,7 +55,6 @@
 		22AEEFD6123B5132E8909B58 /* Pods-MyHenFarm2.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MyHenFarm2.debug.xcconfig"; path = "Target Support Files/Pods-MyHenFarm2/Pods-MyHenFarm2.debug.xcconfig"; sourceTree = "<group>"; };
 		4D19C32FFEB834FB572E4200 /* Pods_MyHenFarm2.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MyHenFarm2.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		743BFE322E9681D300FC549B /* SafariTabsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariTabsVC.swift; sourceTree = "<group>"; };
-		743BFE342E96922400FC549B /* PreloadedSafariVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreloadedSafariVC.swift; sourceTree = "<group>"; };
 		745D9BAB2E624AC80031F9AC /* AppParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppParameters.swift; sourceTree = "<group>"; };
 		745D9BAC2E624AC80031F9AC /* AppsFlyerManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppsFlyerManager.swift; sourceTree = "<group>"; };
 		745D9BAD2E624AC80031F9AC /* InternetViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InternetViewController.swift; sourceTree = "<group>"; };
@@ -116,7 +114,6 @@
 		745D9BB02E624AC80031F9AC /* Loading */ = {
 			isa = PBXGroup;
 			children = (
-				743BFE342E96922400FC549B /* PreloadedSafariVC.swift */,
 				743BFE322E9681D300FC549B /* SafariTabsVC.swift */,
 				745D9BAB2E624AC80031F9AC /* AppParameters.swift */,
 				745D9BAC2E624AC80031F9AC /* AppsFlyerManager.swift */,
@@ -412,7 +409,6 @@
 				745D9BB32E624AC80031F9AC /* InternetViewController.swift in Sources */,
 				745D9BB42E624AC80031F9AC /* LoadingView.swift in Sources */,
 				745D9BB52E624AC80031F9AC /* NetworkManager.swift in Sources */,
-				743BFE352E96922900FC549B /* PreloadedSafariVC.swift in Sources */,
 				74D1A2A22E5E51DC00A63DA4 /* AggsFeedingStatisticView.swift in Sources */,
 				74D1A2A32E5E51DC00A63DA4 /* HomeView.swift in Sources */,
 				74D1A2A42E5E51DC00A63DA4 /* HomeViewModel.swift in Sources */,
