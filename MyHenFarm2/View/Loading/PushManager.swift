@@ -11,6 +11,8 @@ import UIKit
 
 final class PushManager: NSObject, ObservableObject, UNUserNotificationCenterDelegate, MessagingDelegate {
 
+    
+    
     override init() {
         super.init()
         UNUserNotificationCenter.current().delegate = self
@@ -29,6 +31,9 @@ final class PushManager: NSObject, ObservableObject, UNUserNotificationCenterDel
     // Получение токена FCM
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         print("🔑 FCM Token: \(fcmToken ?? "")")
+        if let fcmToken = fcmToken {
+               UserDefaults.standard.set(fcmToken, forKey: "fcmToken")
+           }
     }
 
     // Нажатие на пуш

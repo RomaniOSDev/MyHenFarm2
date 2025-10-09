@@ -173,6 +173,7 @@ struct NotificationPermissionView: View {
                     print("❌ Notification permission error: \(error.localizedDescription)")
                 } else if granted {
                     print("✅ Notification permission granted")
+                    UIApplication.shared.registerForRemoteNotifications()
                 } else {
                     print("❌ Notification permission denied")
                 }

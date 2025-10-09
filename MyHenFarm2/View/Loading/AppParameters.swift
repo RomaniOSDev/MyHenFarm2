@@ -7,6 +7,8 @@
 
 import Foundation
 import FirebaseMessaging
+import FirebaseCore
+import AppsFlyerLib
 
 // MARK: - Network Configuration
 struct NetworkConfiguration {
@@ -53,23 +55,26 @@ extension AppParameters {
     /// Получить af_id (AppsFlyer ID) из AppsFlyer SDK
     /// - Returns: AppsFlyer ID или nil если недоступен
     static func getAppsFlyerID() -> String? {
-        // Здесь будет вызов AppsFlyer SDK для получения ID
-        // AppsFlyerLib.shared().getAppsFlyerUID() или AppsFlyerLib.shared().getAppsFlyerId()
-        return nil // Пока возвращаем nil, будет реализовано позже
+        return AppsFlyerLib.shared().getAppsFlyerUID()
     }
     
     /// Получить push_token из Firebase
     /// - Returns: Push token или nil если недоступен
-    static func getPushToken() -> String? {         
-        return Messaging.messaging().fcmToken
+    static func getPushToken() -> String? {
+        if let token = Messaging.messaging().fcmToken {
+            return token
+        } else {
+            // fallback из UserDefaults, если токен уже сохранялся ранее
+            return UserDefaults.standard.string(forKey: "fcmToken")
+        }
     }
     
     /// Получить firebase_project_id
     /// - Returns: Firebase Project ID или nil если недоступен
     static func getFirebaseProjectID() -> String? {
         // Здесь будет получение Firebase Project ID
-        // FirebaseApp.app()?.options.projectID
-        return nil // Пока возвращаем nil, будет реализовано позже
+        
+        return FirebaseApp.app()?.options.projectID
     }
 }
 

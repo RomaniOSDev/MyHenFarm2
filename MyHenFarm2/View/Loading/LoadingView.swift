@@ -297,12 +297,39 @@ class LoadingView: UIViewController {
         }
     }
     
-
+    private func preparePayload() -> [String: Any] {
+        // 1️⃣ Начинаем с базовых параметров
+        var payload = AppParameters.requiredParameters
+        
+        // 2️⃣ Добавляем AppsFlyer ID
+        payload["af_id"] = AppParameters.getAppsFlyerID() ?? ""
+        
+        // 3️⃣ Добавляем push токен
+        payload["push_token"] = AppParameters.getPushToken() ?? ""
+        
+        // 4️⃣ Добавляем Firebase Project ID
+        payload["firebase_project_id"] = AppParameters.getFirebaseProjectID() ?? ""
+        
+        // 5️⃣ Добавляем конверсионные данные AppsFlyer
+        for (key, value) in appsFlyerData {
+            if let value = value {
+                payload[key] = value
+            }
+        }
+        
+        return payload
+    }
+    
     private func sendNetworkRequest() {
-        // debug: NET sending conversion to server
+        // ✅ Собираем payload с fallback
+        let payload = preparePayload()
+        
+        // debug
+        print("📤 Sending payload to server: \(payload)")
+        
         networkManager.sendConversionData(
-            appsFlyerData: appsFlyerData,
-            additionalData: additionalData
+            appsFlyerData: appsFlyerData, // оставляем для совместимости, если сервер требует отдельные конверсии
+            additionalData: payload
         ) { [weak self] result in
             DispatchQueue.main.async {
                 self?.handleNetworkResult(result)
