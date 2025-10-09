@@ -8,6 +8,9 @@ final class WebviewVC: UIViewController, WKNavigationDelegate {
     private var progressView: UIProgressView!
     private var checkTask: URLSessionDataTask?
 
+    // Храним последний URL из цепочки
+    private var lastCheckedURL: URL?
+
     init(url: URL) {
         self.startURL = url
         super.init(nibName: nil, bundle: nil)
@@ -18,21 +21,25 @@ final class WebviewVC: UIViewController, WKNavigationDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        observeProgress()
         loadURL(startURL)
     }
 
-    // MARK: - Setup UI
+    // MARK: - UI
     private func setupUI() {
         view.backgroundColor = .systemBackground
 
-        // ✅ WebView
         let config = WKWebViewConfiguration()
         config.defaultWebpagePreferences.allowsContentJavaScript = true
+
         webView = WKWebView(frame: .zero, configuration: config)
         webView.navigationDelegate = self
         webView.translatesAutoresizingMaskIntoConstraints = false
+        
+        // ✅ Свайп-навигация и предпросмотр ссылок
+        webView.allowsBackForwardNavigationGestures = true
+        webView.allowsLinkPreview = true
 
-        // ✅ Progress bar
         progressView = UIProgressView(progressViewStyle: .bar)
         progressView.tintColor = .systemBlue
         progressView.trackTintColor = .systemGray5
@@ -55,6 +62,25 @@ final class WebviewVC: UIViewController, WKNavigationDelegate {
         ])
     }
 
+    private func observeProgress() {
+        webView.addObserver(self, forKeyPath: "estimatedProgress", options: .new, context: nil)
+    }
+
+    override func observeValue(forKeyPath keyPath: String?,
+                                of object: Any?,
+                                change: [NSKeyValueChangeKey : Any]?,
+                                context: UnsafeMutableRawPointer?) {
+        guard keyPath == "estimatedProgress" else { return }
+        progressView.isHidden = false
+        progressView.progress = Float(webView.estimatedProgress)
+        if webView.estimatedProgress >= 1.0 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [weak self] in
+                self?.progressView.isHidden = true
+                self?.progressView.progress = 0
+            }
+        }
+    }
+
     private func loadURL(_ url: URL) {
         print("🌍 Загружаем: \(url.absoluteString)")
         let request = URLRequest(url: url)
@@ -71,18 +97,22 @@ final class WebviewVC: UIViewController, WKNavigationDelegate {
             return
         }
 
-        // Проверяем только клики внутри страницы
+        // Проверяем только клики
         if navigationAction.navigationType == .linkActivated {
             decisionHandler(.cancel)
+            progressView.isHidden = false
+            progressView.progress = 0.1
+
             checkRedirects(for: url) { [weak self] result in
                 guard let self = self else { return }
 
                 DispatchQueue.main.async {
                     switch result {
                     case .success(let finalURL):
-                        print("✅ Проверка ОК. Загружаем: \(finalURL)")
+                        print("✅ Проверка пройдена, загружаем \(finalURL)")
                         self.loadURL(finalURL)
-                    case .failure:
+                    case .failure(let error):
+                        print("❌ Ошибка при проверке: \(error.localizedDescription)")
                         self.showRedirectAlert(for: url)
                     }
                 }
@@ -95,10 +125,9 @@ final class WebviewVC: UIViewController, WKNavigationDelegate {
     // MARK: - Redirect Checking
     private func checkRedirects(for url: URL,
                                 attempt: Int = 1,
-                                maxAttempts: Int = 3,
+                                maxAttempts: Int = 5,
                                 completion: @escaping (Result<URL, Error>) -> Void) {
-        progressView.isHidden = false
-        progressView.progress = 0.1
+        lastCheckedURL = url
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -112,16 +141,17 @@ final class WebviewVC: UIViewController, WKNavigationDelegate {
 
             if let error = error as NSError?,
                error.code == NSURLErrorHTTPTooManyRedirects {
-                print("⚠️ Попытка \(attempt): ERR_TOO_MANY_REDIRECTS")
+                print("⚠️ ERR_TOO_MANY_REDIRECTS на \(url)")
 
                 if attempt < maxAttempts {
                     DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        // 🔁 Пробуем снова с тем же URL (не с последним успешным)
                         self.checkRedirects(for: url, attempt: attempt + 1, completion: completion)
                     }
                 } else {
                     DispatchQueue.main.async {
-                        self.hideProgress()
-                        completion(.failure(error))
+                        self.clearCookies()
+                        completion(.success(self.lastCheckedURL ?? url))
                     }
                 }
                 return
@@ -131,36 +161,27 @@ final class WebviewVC: UIViewController, WKNavigationDelegate {
                (300...399).contains(httpResponse.statusCode),
                let location = httpResponse.allHeaderFields["Location"] as? String,
                let redirectURL = URL(string: location, relativeTo: url) {
-                print("➡️ Редирект на: \(redirectURL)")
+                print("➡️ Redirect: \(redirectURL)")
+                self.lastCheckedURL = redirectURL
                 self.checkRedirects(for: redirectURL, attempt: attempt, completion: completion)
                 return
             }
 
-            // ✅ Всё ок — продолжаем с последним URL
             DispatchQueue.main.async {
-                self.showFullProgressThenHide()
-                completion(.success(url))
+                completion(.success(self.lastCheckedURL ?? url))
             }
         }
 
         checkTask?.resume()
     }
 
-    // MARK: - Progress bar helpers
-    private func showFullProgressThenHide() {
-        progressView.setProgress(1.0, animated: true)
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-            self.hideProgress()
-        }
-    }
-
-    private func hideProgress() {
-        UIView.animate(withDuration: 0.3, animations: {
-            self.progressView.alpha = 0
-        }) { _ in
-            self.progressView.isHidden = true
-            self.progressView.alpha = 1
-            self.progressView.progress = 0
+    // MARK: - Очистка cookies
+    private func clearCookies() {
+        let dataStore = WKWebsiteDataStore.default()
+        dataStore.fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
+            dataStore.removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), for: records) {
+                print("🧹 Cookies очищены")
+            }
         }
     }
 
