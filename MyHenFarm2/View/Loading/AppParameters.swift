@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import FirebaseMessaging
 
 // MARK: - Network Configuration
 struct NetworkConfiguration {
@@ -59,10 +60,8 @@ extension AppParameters {
     
     /// Получить push_token из Firebase
     /// - Returns: Push token или nil если недоступен
-    static func getPushToken() -> String? {
-        // Здесь будет получение push token из Firebase
-        // Messaging.messaging().fcmToken
-        return nil // Пока возвращаем nil, будет реализовано позже
+    static func getPushToken() -> String? {         
+        return Messaging.messaging().fcmToken
     }
     
     /// Получить firebase_project_id

@@ -34,6 +34,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // Force light interface style across the app
         window?.overrideUserInterfaceStyle = .light
         window?.makeKeyAndVisible()
+        
+        NotificationCenter.default.addObserver(
+            forName: .pushOpenedWithURL,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard
+                let url = notification.userInfo?["url"] as? URL,
+                let self = self
+            else { return }
+
+            print("🌐 Opening push URL from SceneDelegate: \(url)")
+            self.presentNotificationThenWebView(with: url)
+        }
     }
 
     // MARK: - Deep Link Handling (Custom URL Schemes & Universal Links)
