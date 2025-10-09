@@ -48,6 +48,11 @@
 		74D1A2A62E5E51DC00A63DA4 /* OnBoardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A2892E5E51DB00A63DA4 /* OnBoardingView.swift */; };
 		74D1A2A72E5E51DC00A63DA4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A28B2E5E51DB00A63DA4 /* SettingsView.swift */; };
 		74D1A2A82E5E51DC00A63DA4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A28D2E5E51DB00A63DA4 /* ContentView.swift */; };
+		74F245982E9800A400E4D713 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 74F245972E9800A400E4D713 /* GoogleService-Info.plist */; };
+		74F2459B2E98016700E4D713 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 74F2459A2E98016700E4D713 /* FirebaseAnalytics */; };
+		74F2459D2E98016700E4D713 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 74F2459C2E98016700E4D713 /* FirebaseCore */; };
+		74F2459F2E98016700E4D713 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 74F2459E2E98016700E4D713 /* FirebaseMessaging */; };
+		74F245A12E98220100E4D713 /* PushManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74F245A02E9821FF00E4D713 /* PushManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -97,6 +102,8 @@
 		74D1A2892E5E51DB00A63DA4 /* OnBoardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnBoardingView.swift; sourceTree = "<group>"; };
 		74D1A28B2E5E51DB00A63DA4 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		74D1A28D2E5E51DB00A63DA4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		74F245972E9800A400E4D713 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		74F245A02E9821FF00E4D713 /* PushManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -104,6 +111,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				74F2459F2E98016700E4D713 /* FirebaseMessaging in Frameworks */,
+				74F2459B2E98016700E4D713 /* FirebaseAnalytics in Frameworks */,
+				74F2459D2E98016700E4D713 /* FirebaseCore in Frameworks */,
 				745D9BB82E624B3A0031F9AC /* AppsFlyerLib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -114,6 +124,7 @@
 		745D9BB02E624AC80031F9AC /* Loading */ = {
 			isa = PBXGroup;
 			children = (
+				74F245A02E9821FF00E4D713 /* PushManager.swift */,
 				743BFE322E9681D300FC549B /* SafariTabsVC.swift */,
 				745D9BAB2E624AC80031F9AC /* AppParameters.swift */,
 				745D9BAC2E624AC80031F9AC /* AppsFlyerManager.swift */,
@@ -155,6 +166,7 @@
 				74816A362E57AF0C0031320F /* LaunchScreen.storyboard */,
 				74816A382E57AF0C0031320F /* Main.storyboard */,
 				74816A392E57AF0C0031320F /* SceneDelegate.swift */,
+				74F245972E9800A400E4D713 /* GoogleService-Info.plist */,
 			);
 			path = MyHenFarm2;
 			sourceTree = "<group>";
@@ -330,6 +342,7 @@
 			mainGroup = 74816A112E57AC3B0031320F;
 			packageReferences = (
 				745D9BB62E624B3A0031F9AC /* XCRemoteSwiftPackageReference "AppsFlyerFramework" */,
+				74F245992E98016700E4D713 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			productRefGroup = 74816A1B2E57AC3B0031320F /* Products */;
 			projectDirPath = "";
@@ -346,6 +359,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				74816A3C2E57AF0C0031320F /* Assets.xcassets in Resources */,
+				74F245982E9800A400E4D713 /* GoogleService-Info.plist in Resources */,
 				74816A3E2E57AF0C0031320F /* LaunchScreen.storyboard in Resources */,
 				74816A3F2E57AF0C0031320F /* Main.storyboard in Resources */,
 			);
@@ -409,6 +423,7 @@
 				745D9BB32E624AC80031F9AC /* InternetViewController.swift in Sources */,
 				745D9BB42E624AC80031F9AC /* LoadingView.swift in Sources */,
 				745D9BB52E624AC80031F9AC /* NetworkManager.swift in Sources */,
+				74F245A12E98220100E4D713 /* PushManager.swift in Sources */,
 				74D1A2A22E5E51DC00A63DA4 /* AggsFeedingStatisticView.swift in Sources */,
 				74D1A2A32E5E51DC00A63DA4 /* HomeView.swift in Sources */,
 				74D1A2A42E5E51DC00A63DA4 /* HomeViewModel.swift in Sources */,
@@ -453,15 +468,20 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = MyHenFarm2/MyHenFarm2.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 32;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyHenFarm2/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "HenHouse Farm";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Нужен доступ к камере, чтобы делать фото ваших кур и курятников.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Нужен доступ для сохранения фотографий, сделанных в приложении, в библиотеку.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Нужен доступ к фотобиблиотеке, чтобы выбирать изображения для записей фермы.";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "Идентификатор для рекламы помогает нам показывать более релевантные предложения.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -488,15 +508,20 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = MyHenFarm2/MyHenFarm2.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 32;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyHenFarm2/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "HenHouse Farm";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Нужен доступ к камере, чтобы делать фото ваших кур и курятников.";
+				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Нужен доступ для сохранения фотографий, сделанных в приложении, в библиотеку.";
+				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Нужен доступ к фотобиблиотеке, чтобы выбирать изображения для записей фермы.";
+				INFOPLIST_KEY_NSUserTrackingUsageDescription = "Идентификатор для рекламы помогает нам показывать более релевантные предложения.";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -666,6 +691,14 @@
 				minimumVersion = 6.17.4;
 			};
 		};
+		74F245992E98016700E4D713 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 12.4.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -673,6 +706,21 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 745D9BB62E624B3A0031F9AC /* XCRemoteSwiftPackageReference "AppsFlyerFramework" */;
 			productName = AppsFlyerLib;
+		};
+		74F2459A2E98016700E4D713 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 74F245992E98016700E4D713 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		74F2459C2E98016700E4D713 /* FirebaseCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 74F245992E98016700E4D713 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCore;
+		};
+		74F2459E2E98016700E4D713 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 74F245992E98016700E4D713 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
 		};
 /* End XCSwiftPackageProductDependency section */
 
