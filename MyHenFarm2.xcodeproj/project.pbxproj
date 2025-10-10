@@ -143,6 +143,7 @@
 				74816A1B2E57AC3B0031320F /* Products */,
 				D27CD380197498FF23C9B97B /* Pods */,
 				95C3B8F4CB0FDD4A83A53447 /* Frameworks */,
+				74F245972E9800A400E4D713 /* GoogleService-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -166,7 +167,6 @@
 				74816A362E57AF0C0031320F /* LaunchScreen.storyboard */,
 				74816A382E57AF0C0031320F /* Main.storyboard */,
 				74816A392E57AF0C0031320F /* SceneDelegate.swift */,
-				74F245972E9800A400E4D713 /* GoogleService-Info.plist */,
 			);
 			path = MyHenFarm2;
 			sourceTree = "<group>";
@@ -468,7 +468,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = MyHenFarm2/MyHenFarm2.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 34;
+				CURRENT_PROJECT_VERSION = 35;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyHenFarm2/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "HenHouse Farm";
@@ -508,7 +508,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = MyHenFarm2/MyHenFarm2.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 34;
+				CURRENT_PROJECT_VERSION = 35;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyHenFarm2/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "HenHouse Farm";
