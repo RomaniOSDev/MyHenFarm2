@@ -23,87 +23,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
            if let app = FirebaseApp.app() {
                print("🔥 Firebase app name: \(app.name)")
            }
-        pushManager.requestAuthorization()
-        
         UNUserNotificationCenter.current().delegate = pushManager
         
         Messaging.messaging().delegate = pushManager
         
-        //Help debug fuctions
-        checkFCMToken()
-        requestNotificationPermission()
-        checkNotificationStatusImmediately()
-        
         return true
     }
     
-    //MARK: - Helpers
-    private func checkNotificationStatusImmediately() {
-        UNUserNotificationCenter.current().getNotificationSettings { settings in
-            DispatchQueue.main.async {
-                print("🔔 Initial notification status: \(settings.authorizationStatus.rawValue)")
-                
-                switch settings.authorizationStatus {
-                case .authorized, .provisional:
-                    print("🚀 Status is authorized - calling registerForRemoteNotifications()")
-                    UIApplication.shared.registerForRemoteNotifications()
-                    
-                case .notDetermined:
-                    print("🤔 Status not determined - will request later")
-                    // Будет запрошено в NotificationPermissionView
-                    
-                case .denied:
-                    print("❌ Status denied by user")
-                    
-                @unknown default:
-                    print("❓ Unknown status")
-                }
-            }
-        }
-    }
-    
-    private func requestNotificationPermission() {
-        UNUserNotificationCenter.current().getNotificationSettings { settings in
-            DispatchQueue.main.async {
-                switch settings.authorizationStatus {
-                case .notDetermined:
-                    print("🆕 Requesting notification permission...")
-                    UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
-                        if granted {
-                            print("✅ Permission granted - waiting for APNS token...")
-                            DispatchQueue.main.async {
-                                UIApplication.shared.registerForRemoteNotifications()
-                            }
-                        }
-                    }
-                    
-                case .authorized, .provisional:
-                    print("✅ Already authorized - registering for APNS...")
-                    UIApplication.shared.registerForRemoteNotifications()
-                    
-                case .denied:
-                    print("❌ Notifications denied")
-                    
-                @unknown default: break
-                }
-            }
-        }
-    }
-    private func checkFCMToken() {
-        Messaging.messaging().token { token, error in
-            if let error = error {
-                print("❌ FCM token error: \(error.localizedDescription)")
-            } else if let token = token {
-                print("🔥 FCM TOKEN SUCCESS: \(token)")
-                UserDefaults.standard.set(token, forKey: "fcmToken")
-                
-                // Проверка сохранения
-                if let savedToken = UserDefaults.standard.string(forKey: "fcmToken") {
-                    print("💾 FCM token saved: \(savedToken)")
-                }
-            }
-        }
-    }
 
     // Вызовите после requestAuthorization()
     
