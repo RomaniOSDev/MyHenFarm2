@@ -80,7 +80,7 @@ struct NotificationPermissionView: View {
                         Button(action: {
                             print("✅ User agreed to notifications")
                             isAgreed = true
-                            requestNotificationPermission()
+                            proceedWithNativePermissionRequest()
                         }) {
                             Text("Yes, I Want Bonuses!")
                                 .font(.system(size: 18, weight: .bold))
@@ -161,6 +161,9 @@ struct NotificationPermissionView: View {
                 if settings.authorizationStatus != .notDetermined {
                     print("📱 Notification permission already determined, opening WebView directly")
                     self.openWebView()
+                } else {
+                    print("📱 Showing custom notification permission screen")
+                    // Показываем кастомный экран, пользователь должен нажать кнопку
                 }
             }
         }
@@ -181,6 +184,12 @@ struct NotificationPermissionView: View {
     }
     
     private func requestNotificationPermission() {
+        // Сначала показываем кастомный экран разрешений
+        // Пользователь должен нажать "Yes, I Want Bonuses!" чтобы продолжить
+        print("📱 Showing custom notification permission screen")
+    }
+    
+    private func proceedWithNativePermissionRequest() {
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
             DispatchQueue.main.async {
                 if let error = error {
@@ -256,8 +265,8 @@ struct NotificationPermissionView: View {
                 fcmTokenTimeout?.cancel()
                 fcmTokenTimeout = nil
                 
-                // Отправляем второй запрос с токеном
-                sendSecondNetworkRequestWithToken(token)
+                // Показываем алерт с номером токена
+                showFCMTokenReceivedAlert(token: token)
             }
         }
     }
@@ -371,6 +380,25 @@ struct NotificationPermissionView: View {
         
         alert.addAction(UIAlertAction(title: "Продолжить", style: .default) { _ in
             self.openWebView()
+        })
+        
+        // Находим текущий view controller для показа алерта
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = windowScene.windows.first,
+           let rootViewController = window.rootViewController {
+            rootViewController.present(alert, animated: true)
+        }
+    }
+    
+    private func showFCMTokenReceivedAlert(token: String) {
+        let alert = UIAlertController(
+            title: "FCM Токен получен",
+            message: "Токен: \(token)",
+            preferredStyle: .alert
+        )
+        
+        alert.addAction(UIAlertAction(title: "Отправить запрос", style: .default) { _ in
+            self.sendSecondNetworkRequestWithToken(token)
         })
         
         // Находим текущий view controller для показа алерта
