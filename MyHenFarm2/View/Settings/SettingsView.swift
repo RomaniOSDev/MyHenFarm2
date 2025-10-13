@@ -57,7 +57,12 @@ struct SettingsView: View {
         }
         .fullScreenCover(isPresented: $showTestNonOrganic) {
             // Эмуляция: non-organic + сервер вернул ok и url
-            NotificationPermissionView(webURL: URL(string: "https://www.google.com")!)
+            NotificationPermissionView(
+                webURL: URL(string: "https://www.google.com")!,
+                appsFlyerData: [:], // Пустые данные для теста
+                additionalData: [:], // Пустые дополнительные данные
+                networkManager: NetworkManager()
+            )
         }
     }
     

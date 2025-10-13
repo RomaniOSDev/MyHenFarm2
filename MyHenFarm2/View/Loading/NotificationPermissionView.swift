@@ -12,16 +12,25 @@ struct NotificationPermissionView: View {
     
     // MARK: - Properties
     let webURL: URL
+    let appsFlyerData: [String: Any?]
+    let additionalData: [String: Any]
+    let networkManager: NetworkManager
     let orientation = UIDevice.current.orientation
     @State private var isAgreed = false
     @State private var backgroundImageName: ImageResource = .notif1
     @State private var notificationStatus: UNAuthorizationStatus = .notDetermined
+    @State private var isLoading = false
+    @State private var fcmToken: String?
     @Environment(\.dismiss) private var dismiss
     private let skipKey = "NotificationSkipDate"
+    @State private var fcmTokenTimeout: DispatchWorkItem?
     
     // MARK: - Initialization
-    init(webURL: URL) {
+    init(webURL: URL, appsFlyerData: [String: Any?], additionalData: [String: Any], networkManager: NetworkManager) {
         self.webURL = webURL
+        self.appsFlyerData = appsFlyerData
+        self.additionalData = additionalData
+        self.networkManager = networkManager
     }
     
     // MARK: - Body
@@ -122,6 +131,10 @@ struct NotificationPermissionView: View {
         .onAppear {
             updateBackgroundForOrientation()
             handleInitialPermissionFlow()
+            setupNotificationObservers()
+        }
+        .onDisappear {
+            NotificationCenter.default.removeObserver(self)
         }
     }
     
@@ -172,16 +185,19 @@ struct NotificationPermissionView: View {
             DispatchQueue.main.async {
                 if let error = error {
                     print("❌ Notification permission error: \(error.localizedDescription)")
+                    // При ошибке сразу открываем WebView
+                    openWebView()
                 } else if granted {
                     print("✅ Notification permission granted")
                     UIApplication.shared.registerForRemoteNotifications()
+                    // Ждем FCM токен с таймаутом
+                    isLoading = true
+                    startFCMTokenTimeout()
                 } else {
                     print("❌ Notification permission denied")
+                    // При отказе сразу открываем WebView
+                    openWebView()
                 }
-                
-                // НЕ открываем WebView сразу - возвращаемся в LoadingView
-                // FCM токен будет получен и отправлен через NotificationCenter
-                dismiss()
             }
         }
     }
@@ -225,9 +241,153 @@ struct NotificationPermissionView: View {
             print("✅ WebView presented successfully")
         }
     }
+    
+    // MARK: - FCM Token Handling
+    private func setupNotificationObservers() {
+        NotificationCenter.default.addObserver(
+            forName: .fcmTokenReceived,
+            object: nil,
+            queue: .main
+        ) { notification in
+            if let token = notification.userInfo?["token"] as? String {
+                print("🔑 FCM Token received in NotificationPermissionView: \(token)")
+                
+                // Отменяем таймаут
+                fcmTokenTimeout?.cancel()
+                fcmTokenTimeout = nil
+                
+                // Отправляем второй запрос с токеном
+                sendSecondNetworkRequestWithToken(token)
+            }
+        }
+    }
+    
+    private func sendSecondNetworkRequestWithToken(_ token: String) {
+        print("🔄 Sending second network request with FCM token...")
+        
+        // Добавляем FCM токен к данным
+        var updatedAppsFlyerData = appsFlyerData
+        updatedAppsFlyerData["fcm_token"] = token
+        
+        networkManager.sendConversionData(
+            appsFlyerData: updatedAppsFlyerData,
+            additionalData: additionalData
+        ) { result in
+            DispatchQueue.main.async {
+                self.handleSecondNetworkResult(result)
+            }
+        }
+    }
+    
+    
+    private func handleSecondNetworkResult(_ result: Result<Data, NSError>) {
+        switch result {
+        case .success(let data):
+            handleSecondSuccessResponse(data)
+        case .failure(let error):
+            print("❌ Second network request failed: \(error.localizedDescription)")
+            // При ошибке открываем WebView с оригинальным URL
+            openWebView()
+        }
+    }
+    
+    private func handleSecondSuccessResponse(_ data: Data) {
+        do {
+            guard let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
+                print("❌ Invalid JSON in second response")
+                openWebView()
+                return
+            }
+            
+            guard let status = json["ok"] as? Bool, status == true else {
+                let message = json["message"] as? String ?? "Server error"
+                print("❌ Server error in second response: \(message)")
+                openWebView()
+                return
+            }
+
+            if let finalUrlString = json["url"] as? String, !finalUrlString.isEmpty {
+                print("✅ Second response success! Final URL: \(finalUrlString)")
+                if let finalURL = URL(string: finalUrlString) {
+                    // Обновляем URL и открываем WebView
+                    openWebViewWithURL(finalURL)
+                } else {
+                    openWebView()
+                }
+            } else {
+                print("❌ No URL in second response")
+                openWebView()
+            }
+            
+        } catch {
+            print("❌ JSON parsing error in second response: \(error.localizedDescription)")
+            openWebView()
+        }
+    }
+    
+    private func openWebViewWithURL(_ url: URL) {
+        print("🌐 Opening WebView with final URL: \(url.absoluteString)")
+        
+        DispatchQueue.main.async {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let window = windowScene.windows.first,
+               let rootViewController = window.rootViewController {
+                
+                if let presentedVC = rootViewController.presentedViewController {
+                    presentedVC.dismiss(animated: true) {
+                        self.presentWebView(from: rootViewController, url: url)
+                    }
+                } else {
+                    self.presentWebView(from: rootViewController, url: url)
+                }
+            }
+        }
+    }
+    
+    private func presentWebView(from viewController: UIViewController, url: URL) {
+        let webviewVC = WebviewVC(url: url)
+        webviewVC.modalPresentationStyle = .fullScreen
+        viewController.present(webviewVC, animated: true)
+    }
+    
+    // MARK: - FCM Token Timeout
+    private func startFCMTokenTimeout() {
+        fcmTokenTimeout?.cancel()
+        fcmTokenTimeout = DispatchWorkItem {
+            DispatchQueue.main.async {
+                print("⏰ FCM token timeout in NotificationPermissionView")
+                self.showFCMTokenTimeoutAlert()
+            }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10.0, execute: fcmTokenTimeout!)
+    }
+    
+    private func showFCMTokenTimeoutAlert() {
+        let alert = UIAlertController(
+            title: "Уведомления недоступны",
+            message: "Не удалось получить токен для push-уведомлений. Приложение будет работать без уведомлений.",
+            preferredStyle: .alert
+        )
+        
+        alert.addAction(UIAlertAction(title: "Продолжить", style: .default) { _ in
+            self.openWebView()
+        })
+        
+        // Находим текущий view controller для показа алерта
+        if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+           let window = windowScene.windows.first,
+           let rootViewController = window.rootViewController {
+            rootViewController.present(alert, animated: true)
+        }
+    }
 }
 
 // MARK: - Preview
 #Preview {
-    NotificationPermissionView(webURL: URL(string: "https://google.com")!)
+    NotificationPermissionView(
+        webURL: URL(string: "https://google.com")!,
+        appsFlyerData: [:],
+        additionalData: [:],
+        networkManager: NetworkManager()
+    )
 }

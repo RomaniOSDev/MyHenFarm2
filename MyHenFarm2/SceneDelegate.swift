@@ -91,7 +91,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
     
     private func presentNotificationThenWebView(with url: URL) {
-        let vc = UIHostingController(rootView: NotificationPermissionView(webURL: url))
+        // Создаем NetworkManager для NotificationPermissionView
+        let networkManager = NetworkManager()
+        
+        let vc = UIHostingController(rootView: NotificationPermissionView(
+            webURL: url,
+            appsFlyerData: [:], // Пустые данные AppsFlyer для диплинков
+            additionalData: [:], // Пустые дополнительные данные
+            networkManager: networkManager
+        ))
         vc.modalPresentationStyle = .fullScreen
         topMostViewController()?.present(vc, animated: true)
     }

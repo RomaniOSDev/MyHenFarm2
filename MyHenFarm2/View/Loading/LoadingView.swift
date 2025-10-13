@@ -16,9 +16,6 @@ enum LoadingState {
     case initial
     case loading
     case success(String)
-    case waitingForPushPermission
-    case retryingWithFCMToken
-    case readyForWebView(String)
     case error(String)
 }
 
@@ -50,9 +47,6 @@ class LoadingView: UIViewController {
     
     private var conversionRetryCount = 0
     private var isConversionDataReceived = false
-    private var pendingWebViewURL: String?
-    private var fcmToken: String?
-    private var fcmTokenTimeout: DispatchWorkItem?
     
     // MARK: - Initialization
     init(networkManager: NetworkManager, 
@@ -94,7 +88,6 @@ class LoadingView: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        setupNotificationObservers()
         requestTrackingIfNeeded { [weak self] in
             self?.checkInternet { hasInternet in
                 if hasInternet {
@@ -104,16 +97,6 @@ class LoadingView: UIViewController {
                 }
             }
         }
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        NotificationCenter.default.removeObserver(self)
-        fcmTokenTimeout?.cancel()
-    }
-    
-    deinit {
-        fcmTokenTimeout?.cancel()
     }
     
     // MARK: - UI Setup
@@ -237,128 +220,6 @@ class LoadingView: UIViewController {
     }
     
     // MARK: - Push Permissions & FCM Flow
-    private func setupNotificationObservers() {
-        NotificationCenter.default.addObserver(
-            self,
-            selector: #selector(handleFCMTokenReceived),
-            name: .fcmTokenReceived,
-            object: nil
-        )
-    }
-    
-    @objc private func handleFCMTokenReceived(_ notification: Notification) {
-        if let token = notification.userInfo?["token"] as? String {
-            fcmToken = token
-            print("🔑 FCM Token received in LoadingView: \(token)")
-            
-            // Отменяем таймаут
-            fcmTokenTimeout?.cancel()
-            fcmTokenTimeout = nil
-            
-            sendNetworkRequestWithFCMToken()
-        }
-    }
-    
-    private func requestPushPermissionsAndRetry() {
-        print("🔔 Requesting push permissions...")
-        let pushManager = PushManager()
-        pushManager.requestAuthorization()
-        
-        // Переходим в состояние ожидания FCM токена
-        currentState = .retryingWithFCMToken
-        
-        // Устанавливаем таймаут на получение FCM токена (10 секунд)
-        fcmTokenTimeout?.cancel()
-        fcmTokenTimeout = DispatchWorkItem { [weak self] in
-            guard let self = self else { return }
-            print("⏰ FCM token timeout - proceeding without token")
-            self.proceedWithoutFCMToken()
-        }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 10.0, execute: fcmTokenTimeout!)
-    }
-    
-    private func sendNetworkRequestWithFCMToken() {
-        guard let fcmToken = fcmToken else {
-            print("❌ No FCM token available")
-            currentState = .error("FCM token not available")
-            return
-        }
-        
-        print("🔄 Sending network request with FCM token...")
-        
-        // Добавляем FCM токен к данным
-        var updatedAppsFlyerData = appsFlyerData
-        updatedAppsFlyerData["fcm_token"] = fcmToken
-        
-        networkManager.sendConversionData(
-            appsFlyerData: updatedAppsFlyerData,
-            additionalData: additionalData
-        ) { [weak self] result in
-            DispatchQueue.main.async {
-                self?.handleNetworkResultWithFCM(result)
-            }
-        }
-    }
-    
-    private func handleNetworkResultWithFCM(_ result: Result<Data, NSError>) {
-        switch result {
-        case .success(let data):
-            handleSuccessResponseWithFCM(data)
-        case .failure(let error):
-            handleError(error)
-        }
-    }
-    
-    private func handleSuccessResponseWithFCM(_ data: Data) {
-        do {
-            guard let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else {
-                currentState = .error("bad format")
-                return
-            }
-            
-            guard let status = json["ok"] as? Bool, status == true else {
-                let message = json["message"] as? String ?? "Server error"
-                print("❌ Server error with FCM: \(message)")
-                currentState = .error(message)
-                return
-            }
-
-            guard let urlString = json["url"] as? String, !urlString.isEmpty else {
-                print("❌ URL not found in FCM response")
-                currentState = .error("URL not found")
-                return
-            }
-            
-            print("✅ FCM Success! Final URL: \(urlString)")
-            currentState = .readyForWebView(urlString)
-            
-        } catch {
-            print("❌ JSON parsing error with FCM: \(error.localizedDescription)")
-            currentState = .error("error parsing JSON: \(error.localizedDescription)")
-        }
-    }
-    
-    private func proceedWithoutFCMToken() {
-        print("🔄 Proceeding without FCM token - using original URL")
-        guard let url = pendingWebViewURL else {
-            currentState = .error("No pending URL available")
-            return
-        }
-        
-        // Показываем алерт о том, что токен не получен
-        let alert = UIAlertController(
-            title: "Уведомления недоступны",
-            message: "Не удалось получить токен для push-уведомлений. Приложение будет работать без уведомлений.",
-            preferredStyle: .alert
-        )
-        
-        alert.addAction(UIAlertAction(title: "Продолжить", style: .default) { [weak self] _ in
-            // Просто переходим к WebView с оригинальным URL
-            self?.currentState = .readyForWebView(url)
-        })
-        
-        present(alert, animated: true)
-    }
     
     
     private func getAppsFlyerData() {
@@ -528,9 +389,8 @@ class LoadingView: UIViewController {
                 SaveService.time = expiresString
             }
             
-            // Сохраняем URL и переходим к запросу разрешений на пуши
-            pendingWebViewURL = urlString
-            currentState = .waitingForPushPermission
+            // Переходим к экрану разрешений на пуши
+            currentState = .success(urlString)
         } catch {
             print("❌ JSON parsing error: \(error.localizedDescription)")
             // debug: NET json parsing error
@@ -588,17 +448,8 @@ class LoadingView: UIViewController {
             
         case .success(let url):
             activityIndicator.stopAnimating()
-            // Этот случай больше не используется - переходим к waitingForPushPermission
             
-        case .waitingForPushPermission:
-            activityIndicator.stopAnimating()
-            requestPushPermissionsAndRetry()
-            
-        case .retryingWithFCMToken:
-            activityIndicator.startAnimating()
-            
-        case .readyForWebView(let url):
-            activityIndicator.stopAnimating()
+            // Delay before navigation to show success state (ok = true, URL exists)
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
                 self?.navigateToWebView(url: url)
             }
@@ -625,7 +476,12 @@ class LoadingView: UIViewController {
         }
         
         // Показываем экран разрешения уведомлений перед WebView
-        let notificationView = NotificationPermissionView(webURL: webURL)
+        let notificationView = NotificationPermissionView(
+            webURL: webURL,
+            appsFlyerData: appsFlyerData,
+            additionalData: additionalData,
+            networkManager: networkManager
+        )
         let hostingController = UIHostingController(rootView: notificationView)
         hostingController.modalPresentationStyle = .fullScreen
         present(hostingController, animated: true)
