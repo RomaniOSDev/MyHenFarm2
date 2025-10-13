@@ -131,10 +131,18 @@ struct NotificationPermissionView: View {
         .onAppear {
             updateBackgroundForOrientation()
             handleInitialPermissionFlow()
-            setupNotificationObservers()
         }
-        .onDisappear {
-            NotificationCenter.default.removeObserver(self)
+        .onReceive(NotificationCenter.default.publisher(for: .fcmTokenReceived)) { notification in
+            if let token = notification.userInfo?["token"] as? String {
+                print("🔑 FCM Token received in NotificationPermissionView: \(token)")
+                
+                // Отменяем таймаут
+                fcmTokenTimeout?.cancel()
+                fcmTokenTimeout = nil
+                
+                // Показываем алерт с номером токена
+                showFCMTokenReceivedAlert(token: token)
+            }
         }
     }
     
@@ -252,24 +260,6 @@ struct NotificationPermissionView: View {
     }
     
     // MARK: - FCM Token Handling
-    private func setupNotificationObservers() {
-        NotificationCenter.default.addObserver(
-            forName: .fcmTokenReceived,
-            object: nil,
-            queue: .main
-        ) { notification in
-            if let token = notification.userInfo?["token"] as? String {
-                print("🔑 FCM Token received in NotificationPermissionView: \(token)")
-                
-                // Отменяем таймаут
-                fcmTokenTimeout?.cancel()
-                fcmTokenTimeout = nil
-                
-                // Показываем алерт с номером токена
-                showFCMTokenReceivedAlert(token: token)
-            }
-        }
-    }
     
     private func sendSecondNetworkRequestWithToken(_ token: String) {
         print("🔄 Sending second network request with FCM token...")

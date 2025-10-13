@@ -353,25 +353,25 @@ class LoadingView: UIViewController {
                 return
             }
 
-            guard let urlString = json["url"] as? String, !urlString.isEmpty else {
-                print("❌ URL not found in response")
-                // debug: NET url not found
-                currentState = .error("URL not found")
-                return
+            // Проверяем есть ли URL в ответе
+            if let urlString = json["url"] as? String, !urlString.isEmpty {
+                print("✅ Success! URL received: \(urlString)")
+                // debug: NET success url
+                SaveService.lastUrl = URL(string: urlString)
+                
+                if let expiresString = json["expires"] as? String, !expiresString.isEmpty {
+                    print("⏰ Expires: \(expiresString)")
+                    // debug: NET expires
+                    SaveService.time = expiresString
+                }
+                
+                // Переходим к экрану разрешений на пуши
+                currentState = .success(urlString)
+            } else {
+                print("ℹ️ No URL in response - server doesn't want to show WebView")
+                // Сервер не хочет показывать WebView - переходим на заглушку
+                currentState = .error("No WebView needed")
             }
-            
-            print("✅ Success! URL received: \(urlString)")
-            // debug: NET success url
-            SaveService.lastUrl = URL(string: urlString)
-            
-            if let expiresString = json["expires"] as? String, !expiresString.isEmpty {
-                print("⏰ Expires: \(expiresString)")
-                // debug: NET expires
-                SaveService.time = expiresString
-            }
-            
-            // Переходим к экрану разрешений на пуши
-            currentState = .success(urlString)
         } catch {
             print("❌ JSON parsing error: \(error.localizedDescription)")
             // debug: NET json parsing error
