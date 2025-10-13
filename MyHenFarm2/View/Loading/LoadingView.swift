@@ -7,8 +7,6 @@
 
 import UIKit
 import SwiftUI
-import AppTrackingTransparency
-import AdSupport
 import Network
 
 // MARK: - Loading States
@@ -88,13 +86,11 @@ class LoadingView: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        requestTrackingIfNeeded { [weak self] in
-            self?.checkInternet { hasInternet in
-                if hasInternet {
-                    self?.startLoadingProcess()
-                } else {
-                    self?.presentNoInternetAlert()
-                }
+        checkInternet { [weak self] hasInternet in
+            if hasInternet {
+                self?.startLoadingProcess()
+            } else {
+                self?.presentNoInternetAlert()
             }
         }
     }
@@ -166,21 +162,6 @@ class LoadingView: UIViewController {
     // MARK: - Test Action (removed)
     
     // MARK: - ATT
-    private func requestTrackingIfNeeded(completion: @escaping () -> Void) {
-        if #available(iOS 14, *) {
-            let status = ATTrackingManager.trackingAuthorizationStatus
-            switch status {
-            case .notDetermined:
-                ATTrackingManager.requestTrackingAuthorization { _ in
-                    DispatchQueue.main.async { completion() }
-                }
-            default:
-                completion()
-            }
-        } else {
-            completion()
-        }
-    }
 
     // MARK: - Internet Check
     private func checkInternet(completion: @escaping (Bool) -> Void) {
