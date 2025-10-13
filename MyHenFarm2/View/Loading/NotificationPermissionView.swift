@@ -16,6 +16,7 @@ struct NotificationPermissionView: View {
     @State private var isAgreed = false
     @State private var backgroundImageName: ImageResource = .notif1
     @State private var notificationStatus: UNAuthorizationStatus = .notDetermined
+    @Environment(\.dismiss) private var dismiss
     private let skipKey = "NotificationSkipDate"
     
     // MARK: - Initialization
@@ -178,8 +179,9 @@ struct NotificationPermissionView: View {
                     print("❌ Notification permission denied")
                 }
                 
-                // Открываем WebView в любом случае
-                openWebView()
+                // НЕ открываем WebView сразу - возвращаемся в LoadingView
+                // FCM токен будет получен и отправлен через NotificationCenter
+                dismiss()
             }
         }
     }

@@ -32,8 +32,15 @@ final class PushManager: NSObject, ObservableObject, UNUserNotificationCenterDel
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         print("🔑 FCM Token: \(fcmToken ?? "")")
         if let fcmToken = fcmToken {
-               UserDefaults.standard.set(fcmToken, forKey: "fcmToken")
-           }
+            UserDefaults.standard.set(fcmToken, forKey: "fcmToken")
+            
+            // Отправляем уведомление о получении токена
+            NotificationCenter.default.post(
+                name: .fcmTokenReceived,
+                object: nil,
+                userInfo: ["token": fcmToken]
+            )
+        }
     }
 
     // Нажатие на пуш
@@ -69,4 +76,5 @@ final class PushManager: NSObject, ObservableObject, UNUserNotificationCenterDel
 
 extension Notification.Name {
     static let pushOpenedWithURL = Notification.Name("pushOpenedWithURL")
+    static let fcmTokenReceived = Notification.Name("fcmTokenReceived")
 }
