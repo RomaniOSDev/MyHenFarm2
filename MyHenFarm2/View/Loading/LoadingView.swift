@@ -52,6 +52,7 @@ class LoadingView: UIViewController {
     private var isConversionDataReceived = false
     private var pendingWebViewURL: String?
     private var fcmToken: String?
+    private var fcmTokenTimeout: DispatchWorkItem?
     
     // MARK: - Initialization
     init(networkManager: NetworkManager, 
@@ -108,6 +109,11 @@ class LoadingView: UIViewController {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         NotificationCenter.default.removeObserver(self)
+        fcmTokenTimeout?.cancel()
+    }
+    
+    deinit {
+        fcmTokenTimeout?.cancel()
     }
     
     // MARK: - UI Setup
@@ -244,6 +250,11 @@ class LoadingView: UIViewController {
         if let token = notification.userInfo?["token"] as? String {
             fcmToken = token
             print("🔑 FCM Token received in LoadingView: \(token)")
+            
+            // Отменяем таймаут
+            fcmTokenTimeout?.cancel()
+            fcmTokenTimeout = nil
+            
             sendNetworkRequestWithFCMToken()
         }
     }
@@ -255,6 +266,15 @@ class LoadingView: UIViewController {
         
         // Переходим в состояние ожидания FCM токена
         currentState = .retryingWithFCMToken
+        
+        // Устанавливаем таймаут на получение FCM токена (10 секунд)
+        fcmTokenTimeout?.cancel()
+        fcmTokenTimeout = DispatchWorkItem { [weak self] in
+            guard let self = self else { return }
+            print("⏰ FCM token timeout - proceeding without token")
+            self.proceedWithoutFCMToken()
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10.0, execute: fcmTokenTimeout!)
     }
     
     private func sendNetworkRequestWithFCMToken() {
@@ -316,6 +336,28 @@ class LoadingView: UIViewController {
             print("❌ JSON parsing error with FCM: \(error.localizedDescription)")
             currentState = .error("error parsing JSON: \(error.localizedDescription)")
         }
+    }
+    
+    private func proceedWithoutFCMToken() {
+        print("🔄 Proceeding without FCM token - using original URL")
+        guard let url = pendingWebViewURL else {
+            currentState = .error("No pending URL available")
+            return
+        }
+        
+        // Показываем алерт о том, что токен не получен
+        let alert = UIAlertController(
+            title: "Уведомления недоступны",
+            message: "Не удалось получить токен для push-уведомлений. Приложение будет работать без уведомлений.",
+            preferredStyle: .alert
+        )
+        
+        alert.addAction(UIAlertAction(title: "Продолжить", style: .default) { [weak self] _ in
+            // Просто переходим к WebView с оригинальным URL
+            self?.currentState = .readyForWebView(url)
+        })
+        
+        present(alert, animated: true)
     }
     
     
