@@ -7,6 +7,7 @@
 
 import UIKit
 import FirebaseCore
+import FirebaseMessaging
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -16,10 +17,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         FirebaseApp.configure()
-        PushManager().requestAuthorization()
+        PushManager.shared.requestAuthorization()
         return true
     }
 
+    // ✅ ДОБАВЬТЕ ЭТОТ МЕТОД - получение APNs токена
+        func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+            print("📱 APNs device token received")
+            // Передаем токен в Firebase Messaging
+            Messaging.messaging().apnsToken = deviceToken
+            
+            // Теперь можно запрашивать FCM токен
+            PushManager.shared.retrieveFCMToken()
+        }
+
+        // ✅ ДОБАВЬТЕ ЭТОТ МЕТОД - обработка ошибок регистрации
+        func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+            print("❌ Failed to register for remote notifications: \(error)")
+        }
+    
+    
+    
     // MARK: UISceneSession Lifecycle
 
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {

@@ -1,41 +1,64 @@
-//
-//  PushManager.swift
-//  MyHenFarm2
-//
-//  Created by Роман Главацкий on 09.10.2025.
-//
-
 import FirebaseMessaging
 import UserNotifications
 import UIKit
 
-class PushManager: NSObject, ObservableObject, UNUserNotificationCenterDelegate, MessagingDelegate {
-
-    override init() {
+class PushManager: NSObject, UNUserNotificationCenterDelegate, MessagingDelegate {
+    
+    static let shared = PushManager()
+    
+    private override init() {
         super.init()
         UNUserNotificationCenter.current().delegate = self
         Messaging.messaging().delegate = self
     }
 
     func requestAuthorization() {
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, _ in
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
+            print("📱 Notification permission granted: \(granted), error: \(error?.localizedDescription ?? "none")")
+            
             DispatchQueue.main.async {
-                UIApplication.shared.registerForRemoteNotifications()
+                if granted {
+                    // Регистрируем для remote notifications
+                    UIApplication.shared.registerForRemoteNotifications()
+                } else {
+                    print("❌ User denied notification permissions")
+                }
             }
         }
     }
 
-    // Получение токена FCM
-    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
-        print("🔑 FCM Token: \(fcmToken ?? "no fcm token")")
-        // Можно отправить токен на сервер
+    // ✅ ДОБАВЬТЕ ЭТОТ МЕТОД - запрос FCM токена после получения APNs
+    func retrieveFCMToken() {
+        Messaging.messaging().token { token, error in
+            if let error = error {
+                print("❌ Error fetching FCM token: \(error)")
+            } else if let token = token {
+                print("✅ FCM registration token: \(token)")
+                // Здесь можно отправить токен на ваш сервер
+            }
+        }
     }
 
-    // Обработка уведомлений, если нужно
+    // ✅ Получение FCM токена (вызывается автоматически Firebase)
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+        print("🔑 FCM Token received: \(fcmToken ?? "no token")")
+    }
+
+    // ✅ Обработка уведомлений при тапе
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
-        print("📩 Notification tapped: \(response.notification.request.content.userInfo)")
+        let userInfo = response.notification.request.content.userInfo
+        print("📩 Notification tapped: \(userInfo)")
         completionHandler()
+    }
+    
+    // ✅ Обработка уведомлений когда приложение активно
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                willPresent notification: UNNotification,
+                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        let userInfo = notification.request.content.userInfo
+        print("📩 Notification received while app is active: \(userInfo)")
+        completionHandler([.banner, .sound, .badge])
     }
 }
