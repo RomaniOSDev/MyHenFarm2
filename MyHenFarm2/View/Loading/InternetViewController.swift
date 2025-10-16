@@ -21,7 +21,7 @@ final class WebviewVC: UIViewController, WKNavigationDelegate {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        PushManager().requestAuthorization()
+        //PushManager().requestAuthorization()
         setupWebView()
         setupGestures()
         loadURL(startURL)

@@ -27,7 +27,7 @@ class PushManager: NSObject, ObservableObject, UNUserNotificationCenterDelegate,
 
     // Получение токена FCM
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
-        print("🔑 FCM Token: \(fcmToken ?? "")")
+        print("🔑 FCM Token: \(fcmToken ?? "no fcm token")")
         // Можно отправить токен на сервер
     }
 

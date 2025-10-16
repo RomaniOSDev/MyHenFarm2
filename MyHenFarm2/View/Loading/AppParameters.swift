@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import AppsFlyerLib
+import FirebaseMessaging
 
 // MARK: - Network Configuration
 struct NetworkConfiguration {
@@ -54,7 +56,7 @@ extension AppParameters {
     static func getAppsFlyerID() -> String? {
         // Здесь будет вызов AppsFlyer SDK для получения ID
         // AppsFlyerLib.shared().getAppsFlyerUID() или AppsFlyerLib.shared().getAppsFlyerId()
-        return nil // Пока возвращаем nil, будет реализовано позже
+        return AppsFlyerLib.shared().getAppsFlyerUID()
     }
     
     /// Получить push_token из Firebase
@@ -62,7 +64,8 @@ extension AppParameters {
     static func getPushToken() -> String? {
         // Здесь будет получение push token из Firebase
         // Messaging.messaging().fcmToken
-        return nil // Пока возвращаем nil, будет реализовано позже
+        print("get push token started")
+        return Messaging.messaging().fcmToken
     }
     
     /// Получить firebase_project_id
