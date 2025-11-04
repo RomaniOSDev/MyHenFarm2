@@ -22,6 +22,7 @@
 		74816A8D2E57B9330031320F /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74816A892E57B9330031320F /* CoreDataManager.swift */; };
 		74816A8E2E57B9330031320F /* Farm.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 74816A8A2E57B9330031320F /* Farm.xcdatamodeld */; };
 		74ADF7522E70B5F8005EF65E /* NotificationPermissionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74ADF7512E70B5F8005EF65E /* NotificationPermissionView.swift */; };
+		74B566602EA0FF92008F3E50 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 74B5665F2EA0FF92008F3E50 /* GoogleService-Info.plist */; };
 		74D1A28F2E5E51DC00A63DA4 /* AddChikenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A26C2E5E51DB00A63DA4 /* AddChikenView.swift */; };
 		74D1A2902E5E51DC00A63DA4 /* ChikenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A26D2E5E51DB00A63DA4 /* ChikenView.swift */; };
 		74D1A2912E5E51DC00A63DA4 /* ChikenViewmodel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A26E2E5E51DB00A63DA4 /* ChikenViewmodel.swift */; };
@@ -48,7 +49,6 @@
 		74D1A2A62E5E51DC00A63DA4 /* OnBoardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A2892E5E51DB00A63DA4 /* OnBoardingView.swift */; };
 		74D1A2A72E5E51DC00A63DA4 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A28B2E5E51DB00A63DA4 /* SettingsView.swift */; };
 		74D1A2A82E5E51DC00A63DA4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74D1A28D2E5E51DB00A63DA4 /* ContentView.swift */; };
-		74F245982E9800A400E4D713 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 74F245972E9800A400E4D713 /* GoogleService-Info.plist */; };
 		74F2459B2E98016700E4D713 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 74F2459A2E98016700E4D713 /* FirebaseAnalytics */; };
 		74F2459D2E98016700E4D713 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = 74F2459C2E98016700E4D713 /* FirebaseCore */; };
 		74F2459F2E98016700E4D713 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 74F2459E2E98016700E4D713 /* FirebaseMessaging */; };
@@ -76,6 +76,7 @@
 		74816A8C2E57B9330031320F /* Farm.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Farm.xcdatamodel; sourceTree = "<group>"; };
 		74ADF7512E70B5F8005EF65E /* NotificationPermissionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationPermissionView.swift; sourceTree = "<group>"; };
 		74ADF7532E70B8EC005EF65E /* MyHenFarm2.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = MyHenFarm2.entitlements; sourceTree = "<group>"; };
+		74B5665F2EA0FF92008F3E50 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		74D1A26C2E5E51DB00A63DA4 /* AddChikenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddChikenView.swift; sourceTree = "<group>"; };
 		74D1A26D2E5E51DB00A63DA4 /* ChikenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChikenView.swift; sourceTree = "<group>"; };
 		74D1A26E2E5E51DB00A63DA4 /* ChikenViewmodel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChikenViewmodel.swift; sourceTree = "<group>"; };
@@ -102,7 +103,6 @@
 		74D1A2892E5E51DB00A63DA4 /* OnBoardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnBoardingView.swift; sourceTree = "<group>"; };
 		74D1A28B2E5E51DB00A63DA4 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		74D1A28D2E5E51DB00A63DA4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
-		74F245972E9800A400E4D713 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		74F245A02E9821FF00E4D713 /* PushManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PushManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -166,7 +166,7 @@
 				74816A362E57AF0C0031320F /* LaunchScreen.storyboard */,
 				74816A382E57AF0C0031320F /* Main.storyboard */,
 				74816A392E57AF0C0031320F /* SceneDelegate.swift */,
-				74F245972E9800A400E4D713 /* GoogleService-Info.plist */,
+				74B5665F2EA0FF92008F3E50 /* GoogleService-Info.plist */,
 			);
 			path = MyHenFarm2;
 			sourceTree = "<group>";
@@ -359,9 +359,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				74816A3C2E57AF0C0031320F /* Assets.xcassets in Resources */,
-				74F245982E9800A400E4D713 /* GoogleService-Info.plist in Resources */,
 				74816A3E2E57AF0C0031320F /* LaunchScreen.storyboard in Resources */,
 				74816A3F2E57AF0C0031320F /* Main.storyboard in Resources */,
+				74B566602EA0FF92008F3E50 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -468,7 +468,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = MyHenFarm2/MyHenFarm2.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 45;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyHenFarm2/Info.plist;
@@ -509,7 +509,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = MyHenFarm2/MyHenFarm2.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 44;
+				CURRENT_PROJECT_VERSION = 45;
 				DEVELOPMENT_TEAM = "";
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = MyHenFarm2/Info.plist;

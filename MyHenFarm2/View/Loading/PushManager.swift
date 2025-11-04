@@ -13,15 +13,21 @@ class PushManager: NSObject, UNUserNotificationCenterDelegate, MessagingDelegate
     }
 
     func requestAuthorization() {
+        print("🔔 Запрашиваю разрешение на уведомления...")
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { granted, error in
-            print("📱 Notification permission granted: \(granted), error: \(error?.localizedDescription ?? "none")")
+            if let error = error {
+                print("❌ Ошибка при запросе разрешения: \(error.localizedDescription)")
+                return
+            }
+            
+            print("📱 Результат запроса разрешения: \(granted ? "✅ Разрешено" : "❌ Отклонено")")
             
             DispatchQueue.main.async {
                 if granted {
-                    // Регистрируем для remote notifications
+                    print("📲 Регистрирую приложение для remote notifications...")
                     UIApplication.shared.registerForRemoteNotifications()
                 } else {
-                    print("❌ User denied notification permissions")
+                    print("❌ Пользователь отклонил разрешение на уведомления")
                 }
             }
         }
@@ -29,19 +35,32 @@ class PushManager: NSObject, UNUserNotificationCenterDelegate, MessagingDelegate
 
     // ✅ ДОБАВЬТЕ ЭТОТ МЕТОД - запрос FCM токена после получения APNs
     func retrieveFCMToken() {
+        print("🔑 Запрашиваю FCM токен через token()...")
         Messaging.messaging().token { token, error in
             if let error = error {
-                print("❌ Error fetching FCM token: \(error)")
+                print("❌ ОШИБКА при получении FCM токена: \(error.localizedDescription)")
+                if let nsError = error as NSError? {
+                    print("   Код ошибки: \(nsError.code)")
+                    print("   Домен: \(nsError.domain)")
+                    print("   UserInfo: \(nsError.userInfo)")
+                }
             } else if let token = token {
-                print("✅ FCM registration token: \(token)")
+                print("✅ FCM registration token получен через token(): \(token)")
                 // Здесь можно отправить токен на ваш сервер
+            } else {
+                print("⚠️ FCM токен не получен (token = nil)")
             }
         }
     }
 
     // ✅ Получение FCM токена (вызывается автоматически Firebase)
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
-        print("🔑 FCM Token received: \(fcmToken ?? "no token")")
+        if let token = fcmToken {
+            print("🔑 FCM Token получен через делегат didReceiveRegistrationToken: \(token)")
+            print("   ✅ Регистрация в Firebase успешна!")
+        } else {
+            print("⚠️ FCM Token = nil в делегате")
+        }
     }
 
     // ✅ Обработка уведомлений при тапе

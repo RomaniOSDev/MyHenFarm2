@@ -8,6 +8,7 @@
 import Foundation
 import AppsFlyerLib
 import FirebaseMessaging
+import FirebaseCore
 
 // MARK: - Network Configuration
 struct NetworkConfiguration {
@@ -32,12 +33,27 @@ struct AppParameters {
     static let appsFlyerAppID = "6751569488"
     
     // MARK: - Required Parameters for Config Endpoint
-    static let requiredParameters: [String: Any] = [
-        "bundle_id": Bundle.main.bundleIdentifier ?? "com.henhousefarm234.rre3",
-        "os": "iOS",
-        "store_id": "id6751569488",
-        "locale": Locale.current.identifier
-    ]
+    /// Динамически формирует параметры для запроса, включая push_token и firebase_project_id
+    static var requiredParameters: [String: Any] {
+        var parameters: [String: Any] = [
+            "bundle_id": Bundle.main.bundleIdentifier ?? "com.henhousefarm234.rre3",
+            "os": "iOS",
+            "store_id": "id6751569488",
+            "locale": Locale.current.identifier
+        ]
+        
+        // Добавляем push_token, если доступен
+        if let pushToken = getPushToken() {
+            parameters["push_token"] = pushToken
+        }
+        
+        // Добавляем firebase_project_id, если доступен
+        if let projectID = getFirebaseProjectID() {
+            parameters["firebase_project_id"] = projectID
+        }
+        
+        return parameters
+    }
     
     // MARK: - Network Configuration
     static let networkConfiguration = NetworkConfiguration(
@@ -52,28 +68,39 @@ struct AppParameters {
 extension AppParameters {
     
     /// Получить af_id (AppsFlyer ID) из AppsFlyer SDK
-    /// - Returns: AppsFlyer ID или nil если недоступен
     static func getAppsFlyerID() -> String? {
-        // Здесь будет вызов AppsFlyer SDK для получения ID
-        // AppsFlyerLib.shared().getAppsFlyerUID() или AppsFlyerLib.shared().getAppsFlyerId()
         return AppsFlyerLib.shared().getAppsFlyerUID()
     }
     
     /// Получить push_token из Firebase
-    /// - Returns: Push token или nil если недоступен
     static func getPushToken() -> String? {
-        // Здесь будет получение push token из Firebase
-        // Messaging.messaging().fcmToken
-        print("get push token started")
-        return Messaging.messaging().fcmToken
+        print("🔑 getPushToken() вызван")
+        
+        let token = Messaging.messaging().fcmToken
+        
+        if let token = token {
+            print("✅ FCM токен получен через getPushToken(): \(token)")
+            return token
+        } else {
+            print("⚠️ FCM токен еще не доступен (nil)")
+            print("   Возможные причины:")
+            print("   - Firebase еще не получил токен")
+            print("   - APNs токен еще не был установлен")
+            print("   - Разрешение на уведомления не получено")
+            return nil
+        }
     }
     
     /// Получить firebase_project_id
     /// - Returns: Firebase Project ID или nil если недоступен
     static func getFirebaseProjectID() -> String? {
-        // Здесь будет получение Firebase Project ID
-        // FirebaseApp.app()?.options.projectID
-        return nil // Пока возвращаем nil, будет реализовано позже
+        guard let app = FirebaseApp.app(),
+              let projectID = app.options.projectID else {
+            print("⚠️ Firebase Project ID недоступен")
+            return nil
+        }
+        print("✅ Firebase Project ID получен: \(projectID)")
+        return projectID
     }
 }
 
